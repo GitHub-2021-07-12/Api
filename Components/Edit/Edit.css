@@ -1,0 +1,103 @@
+@layer init {
+    :host {
+        --gap: 4px;
+        --placeholder_color: currentColor;
+        --placeholder_opacity: 0.4;
+
+        border: 1px solid #888;
+        border-radius: 2px;
+        display: inline-block;
+        overflow: hidden !important;
+        padding: 4px;
+        user-select: none !important;
+        width: 200px;
+    }
+    :host([_focused]) {
+        border-color: #000;
+    }
+    :host([_invalid]) {
+        background: #faa;
+    }
+    :host([disabled]) {
+        background: #eee;
+        border-color: #ccc;
+    }
+
+
+    slot[name='button_mask__off'] {
+        :host([masked]) & {
+            display: none;
+        }
+    }
+
+    slot[name='button_mask__on'] {
+        :host(:not([masked])) & {
+            display: none;
+        }
+    }
+
+
+    .button {
+        cursor: pointer;
+        display: none !important;
+        height: 24px;
+        outline: none;
+        position: relative !important;
+        stroke: #888;
+        width: 24px;
+
+        &:hover {
+            stroke: #000;
+        }
+    }
+
+    .icon {
+        display: block;
+        fill: none;
+        height: 100%;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.4px;
+        width: 100%;
+    }
+
+
+    #button_clear {
+        :host([button_clear]:not([disabled])) & {
+            display: block !important;
+        }
+    }
+
+    #button_mask {
+        :host([button_mask]:not([disabled])) & {
+            display: block !important;
+        }
+    }
+
+    #input {
+        align-self: stretch !important;
+        background: transparent;
+        border: none;
+        color: inherit;
+        font: inherit;
+        line-height: 1.5;
+        outline: none;
+        padding: 0;
+
+        &::placeholder {
+            color: var(--placeholder_color);
+            opacity: var(--placeholder_opacity);
+        }
+    }
+
+    #root {
+        align-items: center;
+        box-sizing: border-box;
+        display: grid;
+        gap: var(--gap);
+        grid-auto-columns: auto min-content min-content;
+        grid-auto-flow: column;
+        height: 100%;
+        width: 100%;
+    }
+}

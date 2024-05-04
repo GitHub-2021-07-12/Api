@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <title>Repeater</title>
+
+        <style>
+            body {
+                display: grid;
+                gap: 10px;
+            }
+
+            x-repeater {
+                /* display: grid; */
+                /* gap: 10px; */
+            }
+
+
+            .block {
+                background: #0f02;
+                border: 1px solid #000;
+                display: inline-block;
+                padding: 10px;
+                position: relative;
+            }
+
+
+            #repeater_1 {
+                height: 400px;
+                overflow: auto;
+            }
+
+            #svg {
+                border: 1px solid #000;
+                box-sizing: border-box;
+                display: block;
+                height: 400px;
+                width: 100%;
+            }
+
+            #target {
+                background: #f004;
+                display: grid;
+                gap: 10px;
+                width: 300px;
+            }
+        </style>
+
+        <script type='module'>
+            import {Model} from '../../Units/Model/Model.js';
+            import {Repeater} from './Repeater.js';
+
+            await Repeater._defined;
+
+
+            // repeater_1.model = new Model();
+            // repeater_2.delegate = repeater_1.delegate;
+            repeater_1.model = repeater_2.model;
+            // repeater_1.model.sort_prop = 'radius';
+            // repeater_1.refresh();
+
+            // repeater_1.model.fill(['red', 'orange', 'lime', 'green', 'yellow']);
+            // repeater_1.target = '#target';
+
+            // repeater_2.refresh();
+
+            // repeater_2.model.events_dispatch = false;
+
+            let items = [];
+
+            for (let i = 0; i < 1e3; i++) {
+                // repeater_2.model.add({
+                items.push({
+                    color: `rgba(${255 * Math.random()}, ${255 * Math.random()}, ${255 * Math.random()}, 0.4)`,
+                    radius: 100 * Math.random(),
+                    x: svg.clientWidth * Math.random(),
+                    y: svg.clientHeight * Math.random(),
+                });
+            }
+
+            repeater_2.model.add(items);
+
+            // repeater_2.model.events_dispatch = true;
+            // repeater_2.refresh();
+
+
+            toolbar__button_add.onclick = () => {
+                repeater_2.model.add({
+                    color: `rgba(${255 * Math.random()}, ${255 * Math.random()}, ${255 * Math.random()}, 0.4)`,
+                    radius: 100 * Math.random(),
+                    x: svg.clientWidth * Math.random(),
+                    y: svg.clientHeight * Math.random(),
+                });
+            };
+
+            toolbar__button_sort.onclick = () => {
+                repeater_2.model.sort_prop = 'radius';
+                repeater_2.model.sort();
+            };
+
+        </script>
+    </head>
+
+    <body>
+        <div id='toolbar' class='block'>
+            <button id='toolbar__button_add'>Add</button>
+            <button id='toolbar__button_sort'>Sort</button>
+        </div>
+
+        <x-repeater id='repeater_1' class='block' model='1' replacement='repeater'>
+            <template Repeater__delegate>
+                <div class='block' style='background: ${repeater: color};'>${repeater: _index}. ${repeater: radius}</div>
+            </template>
+        </x-repeater>
+
+        <x-repeater id='repeater_2' class='block' replacement_='repeater' target='svg'>
+            <template Repeater__delegate>
+                <svg>
+                    <!-- <circle id='circle' r='${repeater: radius}' fill='${repeater: color}' cx='${repeater: x}' cy='${repeater: y}'></circle> -->
+                    <circle id='circle'></circle>
+                </svg>
+
+                <script>
+                    class Manager extends Repeater.Manager {
+                        _on_click() {
+                            this._model.delete(this._key);
+                        }
+
+
+                        data__apply() {
+                            this._elements.circle.cx.baseVal.value = this._model_item.x;
+                            this._elements.circle.cy.baseVal.value = this._model_item.y;
+                            this._elements.circle.r.baseVal.value = this._model_item.radius;
+                            this._elements.circle.setAttribute('fill', this._model_item.color);
+                        }
+
+                        init() {
+                            this._item.addEventListener('click', this._on_click.bind(this));
+                            this.data__apply();
+                        }
+                    }
+                </script>
+            </template>
+
+            <template Repeater__model>
+                <script>
+                    [
+                        {
+                            color: 'red',
+                            radius: 100 * Math.random(),
+                            x: 1000 * Math.random(),
+                            y: 100 * Math.random(),
+                        },
+                    ]
+                </script>
+            </template>
+        </x-repeater>
+
+        <div id='target' class='block'></div>
+
+        <svg id='svg'></svg>
+    </body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta content='user-scalable=no, width=720' name='viewport'>
+        <title>Component_new</title>
+
+        <style>
+            :not(:defined) {
+                display: none;
+            }
+        </style>
+
+        <script type='module'>
+            let {Component_new} = await import('./Component_new.js');
+            await Component_new._defined;
+        </script>
+    </head>
+
+    <body>
+        <x-component_new></x-component_new>
+    </body>
+</html>

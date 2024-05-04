@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html lang='ru'>
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width'>
+        <title>Switch</title>
+
+        <script type='module' src='./Switch.js'></script>
+    </head>
+
+    <body>
+        <x-switch on animation_implicit></x-switch>
+        <x-switch disabled></x-switch>
+        <x-switch vertical></x-switch>
+    </body>
+
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+        }
+
+        x-switch {
+            /* display: inline-block; */
+            margin: 10px;
+        }
+    </style>
+
+    <script type='module'>
+        window.switch = document.querySelector('x-switch');
+
+
+    </script>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <title>Repeater</title>
+
+        <!-- <script type='module' src='./Repeater.js'></script> -->
+
+
+        <style>
+            body {
+                user-select: none;
+            }
+
+            div {
+                background: #EEE;
+                border: 1px solid #000;
+                display: inline-block;
+                margin: 10px;
+                padding: 10px;
+                vertical-align: middle;
+
+                &[Repeater__filtered] {
+                    /* display: none; */
+                    opacity: 0.2;
+                }
+
+                &[selected] {
+                    background: #AFA;
+                }
+            }
+
+            span {
+                pointer-events: none;
+            }
+
+            x-repeater {
+                border: 1px solid #000;
+                display: block;
+                margin: 10px 0;
+                /* display: contents; */
+            }
+
+
+            :not(:defined) {
+                display: none;
+            }
+        </style>
+
+        <script type='module'>
+            import {Model} from '../../Units/Model/Model.js';
+            import {Repeater} from './Repeater.js';
+
+
+            await Repeater._defined;
+
+            let button_add = document.querySelector('#button_add');
+            let button_delete = document.querySelector('#button_delete');
+            let button_sort = document.querySelector('#button_sort');
+            let input_filter = document.querySelector('#input_filter');
+            let repeaters = document.querySelectorAll('x-repeater');
+
+            let model = repeaters[0].model;
+            repeaters[1].Manager = class extends Repeater.Manager {
+                init() {
+                    // this._item.textContent = `${this._model_item._index} (${this._key}): ${this._model_item.data}`;
+                }
+            };
+            // repeaters[1].delegate = document.createElement('button');
+            // repeaters[1].delegate = repeaters[0].delegate;
+            // repeaters[1].Manager = repeaters[0].Manager;
+            repeaters[1].model = model;
+            repeaters[1].refresh();
+
+            button_add.addEventListener('click', (event) => {
+                model.add({
+                    data: Math.random(),
+                    selected: true,
+                })
+            });
+
+            button_delete.addEventListener('click', (event) => {
+                let keys = [...model._items.entries()].filter(([key, value]) => value.selected).map((entry) => entry[0]);
+                model.delete(keys);
+            });
+
+            input_filter.addEventListener('input', (event) => {
+                let s = input_filter.value.split('').join('.*?');
+                model.filter_regExp = new RegExp(s);
+                model.filter();
+            });
+
+            button_sort.addEventListener('click', (event) => {
+                model.sort();
+            });
+
+            repeaters[0].addEventListener('click', (event) => {
+                if (!event.target.Repeater__manager) return;
+
+                let key = event.target.Repeater__manager._key;
+                let model_item = model.get(key);
+                model.update(key, {selected: !model_item.selected});
+            });
+
+
+            window.model = model;
+        </script>
+    </head>
+
+
+    <body>
+        <button id='button_add'>+</button>
+        <button id='button_delete'>X</button>
+        <button id='button_sort'>Sort</button>
+        <input id='input_filter' placeholder='Filter'></input>
+
+        <x-repeater replacement_='repeater'>
+            <template Repeater__delegate>
+                <div>
+                    <span id='label_index'></span><span>: </span>
+                    <input id='input' value='${repeater: _index} - ${repeater: data}'></input>
+                    <button id='button_remove'>X</button>
+                </div>
+
+                <script>
+                    class Manager extends Repeater.Manager {
+                        _button_remove__on_click() {
+                            this._model.delete(this._key);
+                        }
+
+                        _input__on_input() {
+                            this.data__update();
+                        }
+
+
+                        data__apply() {
+                            this._elements.input.value = this._model_item.data;
+                            this._item.style.background = this._model_item.data;
+                            Repeater.attribute__set(this._item, 'selected', this._model_item.selected);
+                        }
+
+                        data__update() {
+                            let props = {
+                                data: this._elements.input.value,
+                            };
+                            this._model.update(this._key, props);
+                        }
+
+                        index__apply() {
+                            this._elements.label_index.textContent = `${this._model_item._index} (${this._key})`;
+                        }
+
+                        init() {
+                            this._elements.input.addEventListener('input', this._input__on_input.bind(this));
+                            this._elements.button_remove.addEventListener('click', this._button_remove__on_click.bind(this));
+
+                            this.data__apply();
+                            this.index__apply();
+                        }
+                    }
+                </script>
+            </template>
+
+            <template Repeater__model>
+                <script>
+                    ['red', 'orange', 'lime', 'green', 'yellow']
+                </script>
+            </template>
+        </x-repeater>
+
+        <x-repeater replacement='repeater'>
+            <template Repeater__delegate>
+                <div style='background: ${repeater: data}'>
+                    <span>${repeater: _index} - ${repeater: data} - ${repeater: selected}</span>
+                </div>
+            </template>
+        </x-repeater>
+
+        <x-repeater model='10' replacement='repeater'>
+            <template Repeater__delegate>
+                <div>${repeater: _index} - ${repeater: data}</div>
+            </template>
+        </x-repeater>
+    </body>
+</html>

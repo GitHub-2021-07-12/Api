@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta content='initial-scale=1, user-scalable=no, width=device-width' name='viewport'>
+        <title>SwipeArea</title>
+
+        <style>
+            :not(:defined) {
+                display: none;
+            }
+
+
+            body {
+                box-sizing: border-box;
+                display: grid;
+                gap: 10px;
+                grid-template-columns: 1fr 1fr;
+                height: 100dvh;
+                margin: 0;
+                padding: 10px;
+                touch-action: none;
+
+                -webkit-user-select: none;
+                user-select: none;
+            }
+
+
+            .log {
+                background: #eee;
+                border: 1px solid #000;
+                overflow: auto;
+                overflow-wrap: anywhere;
+                padding: 10px;
+                white-space: pre-wrap;
+            }
+
+            .swipeArea {
+                border: 1px solid #000;
+                touch-action: none;
+            }
+        </style>
+
+        <script type='module'>
+            let {Flickable} = await import('../Flickable/Flickable.js');
+            let {SwipeArea} = await import('./SwipeArea.js');
+            await SwipeArea._defined;
+
+
+            window.log = document.querySelector('.log');
+            window.swipeArea = document.querySelector('.swipeArea');
+
+            log.ondblclick = () => log.textContent = '';
+            log.log = (...args) => {
+                // log.textContent += text + '\n';
+                log.textContent += args.join('  ') + '\n';
+                log.scrollTop = log.scrollHeight;
+            };
+            log.addEventListener('touchstart', (event) => event.preventDefault(), false);
+            swipeArea.addEventListener('touchstart', (event) => event.preventDefault(), false);
+        </script>
+    </head>
+
+    <body>
+        <!-- <x-swipeArea></x-swipeArea> -->
+        <x-flickable class='swipeArea'></x-flickable>
+        <div class='log'></div>
+    </body>
+</html>

@@ -1,0 +1,9 @@
+<div id='root'>
+    <slot name='display'>
+        <div id='display' part='display'>
+            <slot id='content' part='content'></slot>
+        </div>
+    </slot>
+    <x-trackBar id='scrollBar_y' class='scrollBar' exportParts='handle, puck, track' part='scrollBar scrollBar_y' vertical></x-trackBar>
+    <x-trackBar id='scrollBar_x' class='scrollBar' exportParts='handle, puck, track' part='scrollBar scrollBar_x'></x-trackBar>
+</div>

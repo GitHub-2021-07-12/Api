@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, user-scalable=no'>
+        <title>Draggable</title>
+
+        <script type='module' src='./Draggable.js'></script>
+
+        <style>
+            body {
+                /* -webkit-user-select: none; */
+                /* box-sizing: border-box; */
+                /* height: 100dvh; */
+                margin: 0;
+                /* padding: 100px; */
+                /* position: relative; */
+                /* touch-action: none; */
+                /* user-select: none; */
+            }
+
+            x-draggable {
+                border: 1px solid red;
+                display: inline-block;
+                position: relative;
+                height: 100px;
+                width: 100px;
+
+                &:active {
+                    background: #faa;
+                }
+
+                &[_swipe] {
+                    background: #afa;
+                }
+            }
+
+
+            #root {
+                -webkit-user-select: none;
+                box-sizing: border-box;
+                height: 100dvh;
+                padding: 10px;
+                touch-action: none;
+                user-select: none;
+            }
+
+            #stick {
+                border-radius: 100%;
+                border: 4px solid blue;
+                display: inline-block;
+                height: 100px;
+                margin-right: 50px;
+                padding: 10px;
+                position: relative;
+                vertical-align: top;
+                width: 100px;
+            }
+
+            #stick__puck {
+                border-radius: 100%;
+                border: 4px solid blue;
+                box-sizing: border-box;
+                display: grid;
+                height: 100%;
+                place-content: center;
+                width: 100%;
+
+                &:not([_swipe]) {
+                    transition: 0.05s;
+                    transition-property: left, top;
+                }
+            }
+        </style>
+
+        <script type='module'>
+            // stick__puck.addEventListener('dblclick', () => {
+            //     stick__puck.position = stick__puck._position_initial;
+            // });
+            // stick__puck.addEventListener('drag', () => {
+            //     stick__puck.textContent = `${stick__puck._pointer_delta.x}, ${stick__puck._pointer_delta.y}`;
+            // });
+
+            window.addEventListener('error', (event) => {
+                alert(event.filename + ' ' + event.message + ' ' + event.lineno);
+            });
+
+            let root = document.querySelector('#root');
+            root.addEventListener('touchstart', (event) => event.preventDefault());
+        </script>
+    </head>
+
+    <body>
+        <div id='root'>
+            <x-draggable id='stick'>
+                <x-draggable
+                    id='stick__puck'
+
+                    gain_='0.5'
+                    radius='100'
+                    shift='20'
+                    shift_jump
+                    unbounded
+                ></x-draggable>
+            </x-draggable>
+
+            <div id='stick'>
+                <x-draggable
+                    id='stick__puck'
+
+                    gain='0.5'
+                    radius='50'
+                    shift='20'
+                    spring
+                    unbounded
+                ></x-draggable>
+            </div>
+
+            <x-draggable></x-draggable>
+            <x-draggable axis='x'></x-draggable>
+            <x-draggable axis='y'></x-draggable>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,54 @@
+@layer init {
+    :host {
+        --gap: 0px;
+        --placeholder_color: currentColor;
+        --placeholder_opacity: 0.4;
+        --puck__length_min: 20%;
+        --puck__margin_inner: 2px;
+        --puck__margin_outer: 2px;
+        --scrollBar__width: 10px;
+
+        border-radius: 2px;
+        border: 1px solid #888;
+        display: block;
+        font-family: 'Arial';
+        max-height: 120px;
+        padding: 4px;
+        width: 400px;
+    }
+    :host([_focused]) {
+        border-color: #000;
+    }
+    :host([disabled]) {
+        background: #eee;
+        border-color: #ccc;
+    }
+
+
+    #input {
+        background: transparent !important;
+        border: none !important;
+        color: inherit;
+        font: inherit;
+        line-height: 1.5;
+        margin: 0 !important;
+        outline: none !important;
+        height: 100%;
+        padding: 0 !important;
+        resize: none !important;
+
+        &::placeholder {
+            color: var(--placeholder_color);
+            opacity: var(--placeholder_opacity);
+        }
+    }
+
+    #root {
+        --gap: inherit;
+        --puck__length_min: inherit;
+        --puck__margin_inner: inherit;
+        --puck__margin_outer: inherit;
+        --scrollBar__width: inherit;
+        height: 100%;
+    }
+}

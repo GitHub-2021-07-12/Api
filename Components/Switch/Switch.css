@@ -1,0 +1,82 @@
+@layer init {
+    :host {
+        --_padding_double: calc(var(--padding) * 2);
+        --_puck__length: var(--puck__length, calc(var(--width) - var(--_puck__margin_double) - var(--_padding_double)));
+        --_puck__margin_double: calc(var(--puck__margin) * 2);
+        --_puck__position: calc(var(--length) - var(--_puck__length) - var(--_puck__margin_double) - var(--_padding_double));
+
+
+        --length: 48px;
+        --padding: 4px;
+        --puck__length: unset;
+        --puck__margin: 0px;
+        --rounding: var(--length);
+        --width: calc(var(--length) / 2);
+
+        background: #ccc;
+        border-radius: var(--rounding) !important;
+        box-sizing: border-box !important;
+        display: block;
+        height: var(--width) !important;
+        padding: var(--padding) !important;
+        width: var(--length) !important;
+    }
+    :host([_animation]) {
+        transition: 0.1s ease-in-out;
+    }
+    :host([on]) {
+        background: #0af;
+    }
+    :host([disabled]) {
+        background: #ddd;
+    }
+    :host([vertical]) {
+        height: var(--length) !important;
+        width: var(--width) !important;
+    }
+
+
+    #puck {
+        background: #fff;
+        border-radius: var(--_puck__length);
+        bottom: 0 !important;
+        left: 0 !important;
+        margin: var(--puck__margin) !important;
+        position: absolute !important;
+        right: 0 !important;
+        top: 0 !important;
+        transition: inherit;
+        width: var(--_puck__length) !important;
+
+        :host([disabled]) & {
+            background: #f8f8f8;
+        }
+        :host([vertical]) & {
+            height: var(--_puck__length) !important;
+            top: var(--_puck__position) !important;
+            width: auto !important;
+
+            :host([on]) & {
+                top: 0 !important;
+            }
+        }
+        :host(:not([vertical])) & {
+            :host([on]) & {
+                left: var(--_puck__position) !important;
+            }
+        }
+    }
+
+    #root {
+        display: contents;
+        transition: inherit;
+    }
+
+    #track {
+        border-radius: calc(var(--rounding) - var(--padding));
+        height: 100% !important;
+        position: relative !important;
+        transition: inherit;
+        width: 100% !important;
+    }
+}

@@ -1,0 +1,31 @@
+@layer props {
+  :host {
+    
+  }
+  
+  
+  .root {
+    
+  }
+}
+
+
+
+
+@layer init {
+  :host {
+    display: contents !important;
+  }
+  
+  :host([hidden]) {
+    display: none !important;
+  }
+  
+  
+  .root {
+    all: inherit;
+    border: 1px solid #000;
+    display: block;
+    padding: 10px;
+  }
+}

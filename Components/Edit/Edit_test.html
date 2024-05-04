@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta content='width=720, user-scalable=no' name='viewport'>
+        <title>Edit</title>
+
+        <style>
+            :not(:defined) {
+                display: none;
+            }
+
+
+            body * {
+                vertical-align: middle;
+            }
+
+
+            #edit_1 {
+                /* color: red; */
+                /* caret-color: blue; */
+                font: 50px 'Arial';
+                padding: 8px;
+                width: 600px;
+
+                &::part(button) {
+                    /* border: 1px solid #888; */
+                    height: 48px;
+                    stroke: blue;
+                    width: 48px;
+                }
+                &::part(button):hover {
+                    stroke: red;
+                }
+
+                &::part(button_clear)::after {
+                    background: blue;
+                    content: '';
+                    display: block;
+                    inset: 0;
+                    /* mask: center no-repeat url('./Edit.svg#cross'); */
+                    /* mask: center no-repeat url('./Edit.svg#cat'); */
+                    mask: center no-repeat url('./Edit.svg#twitter');
+                    position: absolute;
+                }
+                &::part(button_clear):hover::after {
+                    background: red;
+                }
+            }
+
+
+            .icon {
+                display: block;
+                fill: none;
+                height: 48px;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+                width: 48px;
+            }
+        </style>
+
+        <script type='module'>
+            let {Edit} = await import('./Edit.js');
+            await Edit._defined;
+
+            let edit_1 = document.querySelector('#edit_1');
+            let edit_2 = document.querySelector('#edit_2');
+            // edit_1.value = '+7 (___) ___-__-__';
+            edit_1.value = '123';
+            edit_2.value = 'q👨‍👩‍👧‍👦e';
+        </script>
+    </head>
+
+    <body>
+        <x-edit
+            id='edit_1'
+
+            button_clear
+            button_mask
+            dragAndDrop
+            mask_char='👨‍👩‍👧‍👦12'
+            multiline
+            placeholder='password'
+            regExp='^[^@\s]+?@[^\.\s]+?\.[^\.\s]+$'
+            template='+7 ([1-79][\d][\d]) [\d][\d][\d]-[\d][\d]-[\d][\d]'
+            template_char='⚽23'
+        >
+            <meta slot='button_clear'>
+        </x-edit>
+
+        <x-edit id='edit_2' button_clear button_mask disabled_ mask_char='⭐' masked></x-edit>
+
+        <input disabled value='qqq⭐⭐⭐eee'></input>
+        <input placeholder='password' type='password'></input>
+    </body>
+</html>

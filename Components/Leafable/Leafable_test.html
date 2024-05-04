@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta content='width=720, user-scalable=no' name='viewport'>
+        <title>Leafable</title>
+
+        <!-- <script src='./Leafable.js' type='module'></script> -->
+
+        <style>
+            :not(:defined) {
+                display: none;
+            }
+
+
+            body {
+                margin: 0;
+            }
+
+            x-leafable {
+                /* background: #0002; */
+                /* border: 1px solid #000; */
+                /* height: 300px; */
+                /* overflow: unset; */
+                /* width: 300px; */
+
+                &::part(item) {
+                    /* background: #0f02; */
+                    /* left: unset; */
+                    /* top: unset; */
+                    /* transition-duration: 10s; */
+                    /* backface-visibility: hidden; */
+                }
+                /* &[_animation_end]::part(item) { */
+                /*     transition-duration: 0.2s; */
+                /* } */
+
+                /* &[_animation_begin='1']::part(item_current) { */
+                /*     filter: opacity(0); */
+                /*     transform: rotate(0turn) scale(0); */
+                /* } */
+                /* &[_animation_end='1']::part(item_current) { */
+                /*     filter: opacity(1); */
+                /*     transform: rotate(1turn) scale(1); */
+                /* } */
+                /* &[_animation_end='1']::part(item_prev) { */
+                /*     filter: opacity(0); */
+                /*     transform: rotate(1turn) scale(0); */
+                /* } */
+
+                /* &[_animation_begin='-1']::part(item_current) { */
+                /*     filter: opacity(0); */
+                /*     transform: rotate(0turn) scale(0); */
+                /* } */
+                /* &[_animation_end='-1']::part(item_current) { */
+                /*     filter: opacity(1); */
+                /*     transform: rotate(1turn) scale(1); */
+                /* } */
+                /* &[_animation_end='-1']::part(item_prev) { */
+                /*     filter: opacity(0); */
+                /*     transform: rotate(1turn) scale(0); */
+                /* } */
+            }
+
+
+            .item {
+                background: #0f02;
+                border: 1px solid #000;
+                box-sizing: border-box;
+                display: grid;
+                font: 200px 'Arial';
+                height: 100%;
+                overflow: hidden;
+                place-content: center;
+            }
+
+
+            #root {
+                -webkit-user-select: none;
+                box-sizing: border-box;
+                display: grid;
+                height: 100dvh;
+                padding: 10px;
+                /* place-content: center; */
+                touch-action: none;
+                user-select: none;
+            }
+        </style>
+
+        <script type='module'>
+            // import {Leafable} from './Leafable.js';
+
+
+            let Leafable = await import('./Leafable.js');
+            await Leafable._defined;
+
+
+            let leafable = document.querySelector('x-leafable');
+            let root = document.querySelector('#root');
+
+            // leafable.addEventListener('change', (event) => console.log(event));
+            // leafable.addEventListener('animation_end', (event) => {
+            //     console.log(event.target._speed)
+            // });
+
+            window.addEventListener('error', (event) => {
+                alert(event.filename + ' ' + event.message + ' ' + event.lineno);
+            });
+
+            root.addEventListener('touchstart', (event) => event.preventDefault());
+        </script>
+    </head>
+
+    <body>
+        <div id='root'>
+            <x-leafable
+                animation_implicit
+                animation_implicit_direction='-1'
+                delta_='0.2'
+                elastic
+                gain_='0'
+                index='1'
+                looped_
+                shift_='20'
+                velocity_min='10'
+                vertical_
+            >
+                <div class='item'>0</div>
+                <div class='item'>1</div>
+                <div class='item'>2</div>
+            </x-leafable>
+        </div>
+    </body>
+</html>

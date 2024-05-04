@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta content='width=720, user-scalable=no' name='viewport'>
+        <title>TextArea</title>
+
+        <style>
+            :not(:defined) {
+                display: none;
+            }
+
+
+            x-textArea {
+                /* height: 100px; */
+
+                &::part(input) {
+                    /* overflow: hidden !important; */
+                    overflow-wrap: normal;
+                    /* padding: 100px; */
+                }
+                &::part(input)::placeholder {
+                    color: #f00;
+                }
+                &::part(input)::selection {
+                    background-color: #0f0;
+                }
+
+                &::part(puck) {
+                    background: #f00;
+                }
+
+                &::part(track) {
+                    background: #faa;
+                }
+            }
+        </style>
+
+        <script type='module'>
+            let {TextArea} = await import('./TextArea.js');
+            await TextArea._defined;
+
+
+            let textAreas = document.querySelectorAll('x-textArea');
+            textAreas[0].value = 123;
+        </script>
+    </head>
+
+    <body>
+        <x-textArea
+            placeholder='TextArea'
+        ></x-textArea>
+        <x-textArea></x-textArea>
+        <input></input>
+    </body>
+</html>

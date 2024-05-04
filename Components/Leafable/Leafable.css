@@ -1,0 +1,83 @@
+@layer init {
+    :host {
+        display: block;
+        overflow: hidden;
+    }
+
+
+    .item {
+        display: block !important;
+        grid-area: 1 / 1 / -1 / -1 !important;
+        position: relative;
+
+        :host([_animation_begin]) & {
+            transition: none !important;
+        }
+        :host([_animation_end]) & {
+            pointer-events: none !important;
+            transition: 0.5s ease-in-out;
+            transition-delay: 0s !important;
+        }
+    }
+
+
+    #item_current {
+        :host([vertical]) & {
+            :host([_animation_begin='-1']) & {
+                top: 100%;
+            }
+            :host([_animation_begin='1']) & {
+                top: -100%;
+            }
+            :host([_animation_end]) & {
+                top: 0;
+            }
+        }
+        :host(:not([vertical])) & {
+            :host([_animation_begin='-1']) & {
+                left: 100%;
+            }
+            :host([_animation_begin='1']) & {
+                left: -100%;
+            }
+            :host([_animation_end]) & {
+                left: 0;
+            }
+        }
+    }
+
+    #item_prev {
+        :host([vertical]) & {
+            :host([_animation_begin]) & {
+                top: 0;
+            }
+            :host([_animation_end='-1']) & {
+                top: -100%;
+            }
+            :host([_animation_end='1']) & {
+                top: 100%;
+            }
+        }
+        :host(:not([_animation_begin], [_animation_end])) & {
+            display: none !important;
+        }
+        :host(:not([vertical])) & {
+            :host([_animation_begin]) & {
+                left: 0;
+            }
+            :host([_animation_end='-1']) & {
+                left: -100%;
+            }
+            :host([_animation_end='1']) & {
+                left: 100%;
+            }
+        }
+    }
+
+    #root {
+        display: grid;
+        grid-template: 100% / 100%;
+        height: 100%;
+        width: 100%;
+    }
+}

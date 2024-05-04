@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=720, user-scalable=no'>
+        <title>Flickable</title>
+
+        <style>
+            :not(:defined) {
+                display: none;
+            }
+
+            body {
+                margin: 0;
+            }
+
+            #root {
+                -webkit-user-select: none;
+                border: 1px solid #000;
+                box-sizing: border-box;
+                display: grid;
+                gap: 10px;
+                grid-template: 100% / 1fr 1fr;
+                height: 100dvh;
+                padding: 10px;
+                touch-action: none;
+                user-select: none;
+            }
+
+
+            textArea {
+                border: none;
+                margin: 0;
+                outline: none;
+                padding: 50px;
+                resize: none;
+                /* white-space: pre; */
+            }
+
+            x-flickable {
+                --gap: 4px;
+                border: 1px solid #444;
+                font: 24px 'Arial';
+
+                &::part(content) {
+                    margin: 20px;
+                    padding: 20px;
+                }
+
+                /* &::part(display):focus { */
+                /*     background: #0002; */
+                /* } */
+
+                &::part(puck) {
+                    background: red;
+                }
+            }
+        </style>
+
+        <script type='module'>
+            import {Flickable} from './Flickable.js';
+
+
+            await Flickable._defined;
+
+
+            let root = document.querySelector('#root');
+            root.addEventListener('touchstart', (event) => event.preventDefault());
+
+            window.addEventListener('error', (event) => {
+                alert(event.filename + ' ' + event.message + ' ' + event.lineno);
+            });
+
+            window.flickables = document.querySelectorAll('x-flickable');
+            window.textArea = document.querySelector('textArea');
+
+            // flickables[0].textContent = Array(100).join(flickables[0].textContent);
+            textArea.value = Array(100).join(flickables[1].textContent);
+            flickables[0].refresh();
+            flickables[1].textContent = Array(100).join(flickables[1].textContent);
+            flickables[1].refresh();
+        </script>
+    </head>
+
+    <body>
+        <div id='root'>
+            <x-flickable disabled>
+                <textArea slot='display' spellCheck='false'></textArea>
+            </x-flickable>
+            <x-flickable>
+                abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
+            </x-flickable>
+        </div>
+    </body>
+</html>
