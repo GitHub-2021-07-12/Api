@@ -13,6 +13,18 @@
     }
 
 
+    .icon {
+        display: block;
+        fill: none;
+        height: 100%;
+        stroke: #000;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.4px;
+        width: 100%;
+    }
+
+
     #button {
         display: block;
         width: 100%;
