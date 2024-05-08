@@ -8,7 +8,9 @@ import {Draggable} from '../Draggable/Draggable.js';
 
 export class TrackBar extends Component {
     static _components = [Draggable];
-    static _html_url = new URL(`${this.name}.html`, import.meta.url);
+    static _css = true;
+    static _html = true;
+    static _url = import.meta.url;
 
     static _attributes = {
         gain: {
@@ -35,13 +37,9 @@ export class TrackBar extends Component {
         vertical: false,
     };
 
-    static _resources = {
-        'resources.css': new URL(`${this.name}.css`, import.meta.url),
-    };
-
 
     static {
-        this.define();
+        this.init();
     }
 
 

@@ -1,4 +1,4 @@
-// 25.12.2020
+// 25.12.2020; 06.05.2024
 
 
 import {Class} from '../../Units/Class/Class.js';
@@ -9,43 +9,61 @@ import {EventManager} from '../../Units/EventManager/EventManager.js';
 export class Component extends Class.mix(HTMLElement, EventManager) {
     static _attributes = {};
     static _components = [];
-    static _css = '';
     static _defined = null;
     static _dom = null;
     static _html = '';
-    static _interpolation_regExp = /\${\s*(?<key>.*?)\s*:\s*(?<value>.+?)\s*}/g;
+    static _html_url = '';
+    static _interpolation_regExp = /{{\s*(?<key>.*?)(?:\s*:\s*(?<value>.*?))?\s*}}/g;
+    static _resources = {};
     static _shadow_opts = {mode: 'closed'};
+    static _tag = '';
     static _tag_prefix = 'x';
-    static _url = '';
 
 
     static observedAttributes = [];
+    static html = '';
+    static html_url = '';
+    static resources = {};
 
 
-    static _dom__create() {
-        if (typeof this._css != 'string') {
-            this._css = '';
-        }
+    static async _components_defined__await() {
+        let promises = this._components.map((item) => item._defined);
+        await Promise.all(promises);
+    }
 
-        if (typeof this._html != 'string') {
-            this._html = '';
-        }
+    // static _customElement__define() {
+    //     if (customElements.getName(this)) return;
 
-        if (!this._css && !this._html) return;
+    //     let tag = `${this._tag_prefix}-${this.name.toLowerCase()}`;
+    //     customElements.define(tag, this);
+    // }
 
-        let template = document.createElement('template');
+    static async _dom__create() {
+        let html = '';
 
         if (this._html) {
-            template.innerHTML = this._html;
+            html = this._html;
+        }
+        else if (this._html_url) {
+            let response = await fetch(this._html_url);
+            html = await response.text();
         }
 
-        if (this._css) {
-            let style = document.createElement('style');
-            style.textContent = this._css;
-            template.content.append(style);
-        }
+        if (!html) return;
 
+        let template = document.createElement('template');
+        template.innerHTML = this._interpolate(html, this._resources);
         this._dom = template.content;
+    }
+
+    static _interpolate(string, interpolations) {
+        let f = (match, key, value = '') => {
+            let interpolation = interpolations[key];
+
+            return interpolation instanceof Function ? interpolation(value) : interpolation ?? match;
+        };
+
+        return string.replace(this._interpolation_regExp, f);
     }
 
     static _observedAttributes__define() {
@@ -58,37 +76,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
             this.observedAttributes[attribute_name_lowCase] = attribute_name;
             this.observedAttributes.push(attribute_name_lowCase);
         }
-    }
-
-    static _resource_content__proc(resource_content) {
-        let f = (match, key, value) => {
-            if (key == 'url') {
-                return `${this._url}/${value}`;
-            }
-        };
-
-        return resource_content.replace(this._interpolation_regExp, f);
-    }
-
-    static async _resources__define() {
-        if (!this._url || !this._css && !this._html) return;
-
-        let promises = [];
-
-        if (this._css === true) {
-            promises[0] = fetch(`${this._url}/${this.name}.css`).then((response) => response.text());
-        }
-
-        if (this._html === true) {
-            promises[1] = fetch(`${this._url}/${this.name}.html`).then((response) => response.text());
-        }
-
-        let promises_results = await Promise.allSettled(promises);
-        let css = promises_results[0]?.value || this._css;
-        let html = promises_results[1]?.value || this._html;
-
-        this._css = this._resource_content__proc(css);
-        this._html = this._resource_content__proc(html);
     }
 
 
@@ -129,6 +116,23 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         let prop_value = this.css__get(element, prop_name);
 
         return parseFloat(prop_value);
+    }
+
+    static async define() {
+        if (customElements.getName(this)) return;
+
+        this._tag = `${this._tag_prefix}-${this.name}`.toLowerCase();
+        // this._tag = this._tag_prefix + this.identifier__to_hyphen(this.name);
+        this._defined = customElements.whenDefined(this._tag);
+        this._observedAttributes__define();
+
+        await new Promise(setTimeout);
+
+        await Promise.all([
+            this._components_defined__await(),
+            this._dom__create(),
+        ]);
+        customElements.define(this._tag, this);
     }
 
     static height_inner__get(element) {
@@ -174,25 +178,22 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         element.style.height = `${css_height}px`;
     }
 
-    static async init() {
-        if (customElements.getName(this)) return;
+    static identifier__to_camel(identifier) {
+        return identifier.replace(/-([a-z])/gi, (match, char) => char.toUpperCase());
+    }
 
-        this._url = this._url.replace(/\/[^/]+$/, '');
-        this._observedAttributes__define();
+    static identifier__to_hyphen(identifier) {
+        return identifier.replace(/[A-Z]/g, '-$&').toLowerCase();
+    }
 
-        let defined_resolve = null;
-        this._defined = new Promise((resolve) => defined_resolve = resolve);
-
-        await this._resources__define();
-        this._dom__create();
-
-        let components_defined = this._components.map((item) => item._defined);
-        await Promise.all(components_defined);
-
-        let tag = `${this._tag_prefix}-${this.name.toLowerCase()}`;
-        customElements.define(tag, this);
-
-        defined_resolve();
+    static init({
+        html = this._html,
+        html_url = this._html_url,
+        resources = this._resources,
+    } = {}) {
+        this._html = html;
+        this._html_url = html_url;
+        this._resources = resources;
     }
 
     static left__get(element) {
@@ -258,7 +259,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     }
 
     static visible__get(element) {
-        return element.offsetHeight && element.offsetWidth;
+        return !!(element.offsetHeight && element.offsetWidth);
     }
 
     static width_inner__get(element) {
@@ -306,13 +307,13 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
 
     static {
-        this.init();
+        this.define();
     }
 
 
     _attributes = null;
-    _attributes_observing = true;
-    _built = false;
+    _attributes_observing = false;
+    _built = null;
     _elements = null;
     _slots = null;
     _shadow = null;
@@ -360,9 +361,10 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
             attribute_value = null;
         }
 
+        let attributes_observing = this._attributes_observing;
         this._attributes_observing = false;
         this.attribute__set(attribute_name, attribute_value);
-        this._attributes_observing = true;
+        this._attributes_observing = attributes_observing;
     }
 
     _attributes__init() {
@@ -373,34 +375,64 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         }
     }
 
-    _build() {
+    async _build() {
         if (this._built) return;
 
-        let dom = this.constructor._dom?.cloneNode(true);
+        let built_resolve = null;
+        this._built = new Promise((resolve) => built_resolve = resolve);
 
-        if (dom) {
+        if (this.constructor._dom) {
             this._shadow = this.attachShadow(this.constructor._shadow_opts);
-            this._shadow.append(dom);
-            this._elements__define();
+            this._shadow.append(this.constructor._dom.cloneNode(true));
+
             this._slots__define();
+            await Promise.all([
+                this._elements__define(),
+                this._resources__await(),
+            ]);
         }
 
+        this._attributes_observing = true;
         this._attributes__init();
         this._init();
 
-        this._built = true;
+        built_resolve();
     }
 
-    _elements__define() {
+    async _elements__define() {
         let elements = this._shadow.querySelectorAll('[id]');
+        let promises = [];
         this._elements = {};
 
         for (let element of elements) {
             this._elements[element.id] = element;
+
+            // console.log(element, element.constructor, element._built)
+
+            if (!element._built) continue;
+
+            promises.push(element._built);
         }
+
+        await Promise.all(promises);
     }
 
     _init() {}
+
+    async _resources__await() {
+        let promises = [];
+        let resources = this._shadow.querySelectorAll('[component__awaited]');
+
+        for (let resource of resources) {
+            let promise_resolve = null;
+            let promise = new Promise((resolve) => promise_resolve = resolve);
+            promises.push(promise);
+
+            resource.addEventListener('load', () => promise_resolve(), {once: true});
+        }
+
+        await Promise.all(promises);
+    }
 
     _slots__define() {
         let slots = this._shadow.querySelectorAll('slot');
@@ -415,7 +447,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
 
     attributeChangedCallback(attribute_name, attribute_value_prev, attribute_value) {
-        if (!this._attributes_observing || !this._built || attribute_value == attribute_value_prev) return;
+        if (!this._attributes_observing || attribute_value == attribute_value_prev) return;
 
         attribute_name = this.constructor.observedAttributes[attribute_name];
         this[attribute_name] = this._attribute__get(attribute_name);

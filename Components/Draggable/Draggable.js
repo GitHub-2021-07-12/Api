@@ -36,7 +36,7 @@ export class Draggable extends SwipeArea {
 
 
     static {
-        this.init();
+        this.define();
     }
 
 

@@ -1,4 +1,4 @@
-// 25.12.2020; 06.05.2024
+// 25.12.2020
 
 
 import {Class} from '../../Units/Class/Class.js';
@@ -9,51 +9,43 @@ import {EventManager} from '../../Units/EventManager/EventManager.js';
 export class Component extends Class.mix(HTMLElement, EventManager) {
     static _attributes = {};
     static _components = [];
+    static _css = '';
     static _defined = null;
     static _dom = null;
     static _html = '';
-    static _html_url = '';
-    static _interpolation_regExp = /{{\s*(?<key>.*?)(?:\s*:\s*(?<value>.*?))?\s*}}/g;
-    static _resources = {};
+    static _interpolation_regExp = /\${\s*(?<key>.*?)\s*:\s*(?<value>.+?)\s*}/g;
     static _shadow_opts = {mode: 'closed'};
     static _tag_prefix = 'x';
-    // static _url = '';
+    static _url = '';
 
 
     static observedAttributes = [];
 
 
-    static async _components_defined__await() {
-        let promises = this._components.map((item) => item._defined);
-        await Promise.all(promises);
-    }
-
-    static async _dom__create() {
-        let html = '';
-
-        if (this._html) {
-            html = this._html;
-        }
-        else if (this._html_url) {
-            let response = await fetch(this._html_url);
-            html = await response.text();
+    static _dom__create() {
+        if (typeof this._css != 'string') {
+            this._css = '';
         }
 
-        if (!html) return;
+        if (typeof this._html != 'string') {
+            this._html = '';
+        }
+
+        if (!this._css && !this._html) return;
 
         let template = document.createElement('template');
-        template.innerHTML = this._interpolate(html, this._resources);
+
+        if (this._html) {
+            template.innerHTML = this._html;
+        }
+
+        if (this._css) {
+            let style = document.createElement('style');
+            style.textContent = this._css;
+            template.content.append(style);
+        }
+
         this._dom = template.content;
-    }
-
-    static _interpolate(string, interpolations) {
-        let f = (match, key, value = '') => {
-            let interpolation = interpolations[key];
-
-            return interpolation instanceof Function ? interpolation(value) : interpolation ?? match;
-        };
-
-        return string.replace(this._interpolation_regExp, f);
     }
 
     static _observedAttributes__define() {
@@ -66,6 +58,37 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
             this.observedAttributes[attribute_name_lowCase] = attribute_name;
             this.observedAttributes.push(attribute_name_lowCase);
         }
+    }
+
+    static _resource_content__proc(resource_content) {
+        let f = (match, key, value) => {
+            if (key == 'url') {
+                return `${this._url}/${value}`;
+            }
+        };
+
+        return resource_content.replace(this._interpolation_regExp, f);
+    }
+
+    static async _resources__define() {
+        if (!this._url || !this._css && !this._html) return;
+
+        let promises = [];
+
+        if (this._css === true) {
+            promises[0] = fetch(`${this._url}/${this.name}.css`).then((response) => response.text());
+        }
+
+        if (this._html === true) {
+            promises[1] = fetch(`${this._url}/${this.name}.html`).then((response) => response.text());
+        }
+
+        let promises_results = await Promise.allSettled(promises);
+        let css = promises_results[0]?.value || this._css;
+        let html = promises_results[1]?.value || this._html;
+
+        this._css = this._resource_content__proc(css);
+        this._html = this._resource_content__proc(html);
     }
 
 
@@ -151,21 +174,20 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         element.style.height = `${css_height}px`;
     }
 
-    static async init({
-        html = this._html,
-        html_url = this._html_url,
-        // url = this._url,
-    } = {}) {
-        // this._url = url;
-        this._html = html;
-        this._html_url = html_url;
+    static async init() {
+        if (customElements.getName(this)) return;
+
+        this._url = this._url.replace(/\/[^/]+$/, '');
         this._observedAttributes__define();
 
         let defined_resolve = null;
         this._defined = new Promise((resolve) => defined_resolve = resolve);
 
-        // await this._components_defined__await();
-        await this._dom__create();
+        await this._resources__define();
+        this._dom__create();
+
+        let components_defined = this._components.map((item) => item._defined);
+        await Promise.all(components_defined);
 
         let tag = `${this._tag_prefix}-${this.name.toLowerCase()}`;
         customElements.define(tag, this);
@@ -283,14 +305,14 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     }
 
 
-    // static {
-    //     this.init();
-    // }
+    static {
+        this.init();
+    }
 
 
     _attributes = null;
-    _attributes_observing = false;
-    _built = null;
+    _attributes_observing = true;
+    _built = false;
     _elements = null;
     _slots = null;
     _shadow = null;
@@ -351,62 +373,34 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         }
     }
 
-    async _build() {
+    _build() {
         if (this._built) return;
 
-        let built_resolve = null;
-        this._built = new Promise((resolve) => built_resolve = resolve);
+        let dom = this.constructor._dom?.cloneNode(true);
 
-        if (this.constructor._dom) {
+        if (dom) {
             this._shadow = this.attachShadow(this.constructor._shadow_opts);
-            this._shadow.append(this.constructor._dom.cloneNode(true));
-
+            this._shadow.append(dom);
+            this._elements__define();
             this._slots__define();
-            await Promise.all([
-                this._elements__define(),
-                this._resources__await(),
-            ]);
         }
 
         this._attributes__init();
         this._init();
-        // this._attributes_observing = true;
 
-        built_resolve();
+        this._built = true;
     }
 
-    async _elements__define() {
+    _elements__define() {
         let elements = this._shadow.querySelectorAll('[id]');
-        let promises = [];
         this._elements = {};
 
         for (let element of elements) {
             this._elements[element.id] = element;
-
-            if (!element._built) continue;
-
-            promises.push(element._built);
         }
-
-        await Promise.all(promises);
     }
 
     _init() {}
-
-    async _resources__await() {
-        let promises = [];
-        let resources = this._shadow.querySelectorAll('[component__awaited]');
-
-        for (let resource of resources) {
-            let promise_resolve = null;
-            let promise = new Promise((resolve) => promise_resolve = resolve);
-            promises.push(promise);
-
-            resource.addEventListener('load', () => promise_resolve(), {once: true});
-        }
-
-        await Promise.all(promises);
-    }
 
     _slots__define() {
         let slots = this._shadow.querySelectorAll('slot');
@@ -421,7 +415,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
 
     attributeChangedCallback(attribute_name, attribute_value_prev, attribute_value) {
-        if (!this._attributes_observing || attribute_value == attribute_value_prev) return;
+        if (!this._attributes_observing || !this._built || attribute_value == attribute_value_prev) return;
 
         attribute_name = this.constructor.observedAttributes[attribute_name];
         this[attribute_name] = this._attribute__get(attribute_name);

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 
-
 <html>
     <head>
         <meta charset='utf-8'>
@@ -8,12 +7,8 @@
         <title>Flickable</title>
 
         <style>
-            /* :not(:defined) { */
-            /*     display: none; */
-            /* } */
-
-            :root {
-                background: #0002;
+            :not(:defined) {
+                display: none;
             }
 
             body {
@@ -35,7 +30,6 @@
 
 
             textArea {
-                background: transparent;
                 border: none;
                 margin: 0;
                 outline: none;
@@ -46,10 +40,8 @@
 
             x-flickable {
                 --gap: 4px;
-                --puck__margin_outer: 10px;
                 border: 1px solid #444;
                 font: 24px 'Arial';
-                overflow-y: clip;
 
                 &::part(content) {
                     margin: 20px;
@@ -67,15 +59,10 @@
         </style>
 
         <script type='module'>
-            let {Flickable} = await import('./Flickable.js');
-            // let {TrackBar} = await import('../TrackBar/TrackBar.js');
+            import {Flickable} from './Flickable.js';
 
-            Flickable.init({
-                // html: ' ',
-                // resources: {},
-            });
 
-            // await customElements.whenDefined(Flickable._tag);
+            await Flickable._defined;
 
 
             let root = document.querySelector('#root');
@@ -88,11 +75,7 @@
             window.flickables = document.querySelectorAll('x-flickable');
             window.textArea = document.querySelector('textArea');
 
-            await Flickable._defined;
-            await Promise.all([...flickables].map((item) => item._built));
-
-            document.body.hidden = false;
-
+            // flickables[0].textContent = Array(100).join(flickables[0].textContent);
             textArea.value = Array(100).join(flickables[1].textContent);
             flickables[0].refresh();
             flickables[1].textContent = Array(100).join(flickables[1].textContent);
@@ -100,7 +83,7 @@
         </script>
     </head>
 
-    <body hidden>
+    <body>
         <div id='root'>
             <x-flickable disabled>
                 <textArea slot='display' spellCheck='false'></textArea>

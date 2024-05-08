@@ -1,0 +1,114 @@
+@layer init {
+    :host {
+        --_puck_x__length: 0;
+        --_puck_y__length: 0;
+        --_scrollBar_phantom__margin: calc(-1 * var(--scrollBar__width));
+
+
+        --gap: 0px;
+        --puck__length_min: 20%;
+        --puck__margin_inner: 2px;
+        --puck__margin_outer: 2px;
+        --scrollBar__width: 10px;
+
+        display: block;
+    }
+
+
+    slot[name='display']::slotted(*) {
+        overflow: auto !important;
+        scrollbar-width: none !important;
+        touch-action: none !important;
+
+        &::-webkit-scrollbar {
+            display: none !important;
+        }
+    }
+
+
+    .scrollBar {
+        --length: auto !important;
+        --padding: 2px;
+        --rounding: var(--width);
+        --width: var(--scrollBar__width) !important;
+        background: transparent;
+        border-radius: 0;
+        display: none !important;
+    }
+
+
+    #content {
+        box-sizing: border-box !important;
+        display: inline-block;
+    }
+
+    #display {
+        display: block !important;
+        overflow: auto !important;
+        scrollbar-width: none !important;
+        touch-action: none !important;
+
+        &::-webkit-scrollbar {
+            display: none !important;
+        }
+    }
+
+    #root {
+        display: grid;
+        gap: var(--gap);
+        height: 100%;
+        width: 100%;
+
+        :host(:not([scrollBars='hidden'])) & {
+            :host([_scroll_x]) & {
+                grid-template: auto min-content / auto;
+            }
+            :host([_scroll_y]) & {
+                grid-template: auto / auto min-content;
+            }
+            :host([_scroll_x][_scroll_y]) & {
+                grid-template: auto min-content / auto min-content;
+            }
+        }
+    }
+
+    #scrollBar_x {
+        --puck__length: max(var(--puck__length_min), var(--_puck_x__length) * 1px);
+        overflow-x: clip !important;
+
+        &::part(handle) {
+            margin: calc(-1 * var(--puck__margin_inner)) 0 calc(-1 * var(--puck__margin_outer)) 0;
+        }
+
+        :host([scrollBars='phantom']) & {
+            margin-top: var(--_scrollBar_phantom__margin) !important;
+
+            :host([_scroll_y]) & {
+                margin-right: var(--scrollBar__width);
+            }
+        }
+        :host([_scroll_x]:not([scrollBars='hidden'])) & {
+            display: block !important;
+        }
+    }
+
+    #scrollBar_y {
+        --puck__length: max(var(--puck__length_min), var(--_puck_y__length) * 1px);
+        overflow-y: clip !important;
+
+        &::part(handle) {
+            margin: 0 calc(-1 * var(--puck__margin_outer)) 0 calc(-1 * var(--puck__margin_inner));
+        }
+
+        :host([scrollBars='phantom']) & {
+            margin-left: var(--_scrollBar_phantom__margin);
+
+            :host([_scroll_x]) & {
+                margin-bottom: var(--scrollBar__width);
+            }
+        }
+        :host([_scroll_y]:not([scrollBars='hidden'])) & {
+            display: block !important;
+        }
+    }
+}
