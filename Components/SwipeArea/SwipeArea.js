@@ -39,7 +39,7 @@ export class SwipeArea extends Component {
 
 
     static {
-        this.init();
+        this.define();
     }
 
 

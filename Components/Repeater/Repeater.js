@@ -58,7 +58,7 @@ export class Repeater extends Component {
 
 
     static {
-        this.init();
+        this.define();
     }
 
 

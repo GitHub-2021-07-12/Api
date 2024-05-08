@@ -9,7 +9,6 @@ import {Vector_2d} from '../../Units/Vector_2d/Vector_2d.js';
 
 export class Flickable extends SwipeArea {
     static _components = [TrackBar];
-    static _html_url = new URL(`${this.name}.html`, import.meta.url);
 
     static _attributes = {
         ...SwipeArea._attributes,
@@ -33,7 +32,6 @@ export class Flickable extends SwipeArea {
             default: '',
             enum: ['hidden', 'phantom'],
         },
-        'scroll-edge_size': {},
         scrollEdge_size: {
             default: 1,
             range: [0, Infinity],
@@ -46,9 +44,10 @@ export class Flickable extends SwipeArea {
         },
     };
 
-    static _resources = {
-        'resources.css': new URL(`${this.name}.css`, import.meta.url),
-    };
+
+    static css_url = true;
+    static html_url = true;
+    static url = import.meta.url;
 
 
     static {

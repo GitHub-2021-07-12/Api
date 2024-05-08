@@ -7,10 +7,7 @@ import {Flickable} from '../Flickable/Flickable.js';
 
 
 export class TextArea extends Component {
-    static _css = true;
-    static _html = true;
     static _components = [Flickable];
-    static _url = import.meta.url;
 
     static _attributes = {
         _focused: false,
@@ -28,8 +25,13 @@ export class TextArea extends Component {
     };
 
 
+    static css_url = true;
+    static html_url = true;
+    static url = import.meta.url;
+
+
     static {
-        this.init();
+        this.define();
     }
 
 

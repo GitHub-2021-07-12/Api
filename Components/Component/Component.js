@@ -11,19 +11,19 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     static _components = [];
     static _defined = null;
     static _dom = null;
-    static _html = '';
-    static _html_url = '';
     static _interpolation_regExp = /{{\s*(?<key>.*?)(?:\s*:\s*(?<value>.*?))?\s*}}/g;
-    static _resources = {};
     static _shadow_opts = {mode: 'closed'};
     static _tag = '';
     static _tag_prefix = 'x';
 
 
-    static observedAttributes = [];
+    static css = '';
+    static css_url = '';
     static html = '';
     static html_url = '';
+    static observedAttributes = [];
     static resources = {};
+    static url = '';
 
 
     static async _components_defined__await() {
@@ -31,29 +31,37 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         await Promise.all(promises);
     }
 
-    // static _customElement__define() {
-    //     if (customElements.getName(this)) return;
-
-    //     let tag = `${this._tag_prefix}-${this.name.toLowerCase()}`;
-    //     customElements.define(tag, this);
-    // }
-
     static async _dom__create() {
         let html = '';
 
-        if (this._html) {
-            html = this._html;
+        if (this.html) {
+            html = this.html;
         }
-        else if (this._html_url) {
-            let response = await fetch(this._html_url);
+        else if (this.html_url) {
+            let html_url = this.html_url === true ? new URL(`${this.name}.html`, this.url) : this.html_url;
+            let response = await fetch(html_url);
             html = await response.text();
         }
 
         if (!html) return;
 
         let template = document.createElement('template');
-        template.innerHTML = this._interpolate(html, this._resources);
+        template.innerHTML = this._interpolate(html, this.resources);
         this._dom = template.content;
+
+        if (this.css) {
+            let style = document.createElement('style');
+            style.textContent = this.css;
+            style.setAttribute('Component__awaited', '');
+            this._dom.prepend(style);
+        }
+        else if (this.css_url) {
+            let link = document.createElement('link');
+            link.href = this.css_url === true ? new URL(`${this.name}.css`, this.url) : this.css_url;
+            link.rel = 'stylesheet';
+            link.setAttribute('Component__awaited', '');
+            this._dom.prepend(link);
+        }
     }
 
     static _interpolate(string, interpolations) {
@@ -72,9 +80,9 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         for (let attribute_name of Object.keys(this._attributes)) {
             if (attribute_name.startsWith('_')) continue;
 
-            let attribute_name_lowCase = attribute_name.toLowerCase();
-            this.observedAttributes[attribute_name_lowCase] = attribute_name;
-            this.observedAttributes.push(attribute_name_lowCase);
+            let attribute_name_lowerCase = attribute_name.toLowerCase();
+            this.observedAttributes[attribute_name_lowerCase] = attribute_name;
+            this.observedAttributes.push(attribute_name_lowerCase);
         }
     }
 
@@ -122,7 +130,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         if (customElements.getName(this)) return;
 
         this._tag = `${this._tag_prefix}-${this.name}`.toLowerCase();
-        // this._tag = this._tag_prefix + this.identifier__to_hyphen(this.name);
         this._defined = customElements.whenDefined(this._tag);
         this._observedAttributes__define();
 
@@ -184,16 +191,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     static identifier__to_hyphen(identifier) {
         return identifier.replace(/[A-Z]/g, '-$&').toLowerCase();
-    }
-
-    static init({
-        html = this._html,
-        html_url = this._html_url,
-        resources = this._resources,
-    } = {}) {
-        this._html = html;
-        this._html_url = html_url;
-        this._resources = resources;
     }
 
     static left__get(element) {
@@ -407,8 +404,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         for (let element of elements) {
             this._elements[element.id] = element;
 
-            // console.log(element, element.constructor, element._built)
-
             if (!element._built) continue;
 
             promises.push(element._built);
@@ -421,7 +416,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     async _resources__await() {
         let promises = [];
-        let resources = this._shadow.querySelectorAll('[component__awaited]');
+        let resources = this._shadow.querySelectorAll('[Component__awaited]');
 
         for (let resource of resources) {
             let promise_resolve = null;

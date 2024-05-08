@@ -7,10 +7,6 @@ import {SwipeArea} from '../SwipeArea/SwipeArea.js';
 
 
 export class Leafable extends SwipeArea {
-    static _css = true;
-    static _html = true;
-    static _url = import.meta.url;
-
     static _attributes = {
         ...SwipeArea._attributes,
 
@@ -57,10 +53,13 @@ export class Leafable extends SwipeArea {
 
 
     static animations_duration_special = 1e10;
+    static css_url = true;
+    static html_url = true;
+    static url = import.meta.url;
 
 
     static {
-        this.init();
+        this.define();
     }
 
 
