@@ -26,7 +26,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     static url = '';
 
 
-    static async _components_defined__await() {
+    static async _components__await() {
         let promises = this._components.map((item) => item._defined);
         await Promise.all(promises);
     }
@@ -136,7 +136,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         await new Promise(setTimeout);
 
         await Promise.all([
-            this._components_defined__await(),
+            this._components__await(),
             this._dom__create(),
         ]);
         customElements.define(this._tag, this);
@@ -381,10 +381,11 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         if (this.constructor._dom) {
             this._shadow = this.attachShadow(this.constructor._shadow_opts);
             this._shadow.append(this.constructor._dom.cloneNode(true));
-
+            this._elements__define();
             this._slots__define();
+
             await Promise.all([
-                this._elements__define(),
+                this._elements__await(),
                 this._resources__await(),
             ]);
         }
@@ -396,20 +397,18 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         built_resolve();
     }
 
-    async _elements__define() {
+    async _elements__await() {
+        let promises = Object.values(this._elements).map((item) => item._built);
+        await Promise.all(promises);
+    }
+
+    _elements__define() {
         let elements = this._shadow.querySelectorAll('[id]');
-        let promises = [];
         this._elements = {};
 
         for (let element of elements) {
             this._elements[element.id] = element;
-
-            if (!element._built) continue;
-
-            promises.push(element._built);
         }
-
-        await Promise.all(promises);
     }
 
     _init() {}
