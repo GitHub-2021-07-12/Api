@@ -8,6 +8,7 @@ import {EventManager} from '../../Units/EventManager/EventManager.js';
 
 export class Component extends Class.mix(HTMLElement, EventManager) {
     static _attributes = {};
+    static _built_once = false;
     static _components = [];
     static _defined = null;
     static _dom = null;
@@ -381,18 +382,30 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         if (this.constructor._dom) {
             this._shadow = this.attachShadow(this.constructor._shadow_opts);
             this._shadow.append(this.constructor._dom.cloneNode(true));
+
+            // this.style.visibility = 'hidden';
             this._elements__define();
             this._slots__define();
+            this.attribute__set('Component__hidden', true);
 
-            await Promise.all([
-                this._elements__await(),
-                this._resources__await(),
-            ]);
+            if (!this.constructor._built_once) {
+                this.constructor._built_once = true;
+
+                await Promise.all([
+                    this._elements__await(),
+                    this._resources__await(),
+                ]);
+            }
+            else {
+                await Promise.resolve();
+            }
         }
 
         this._attributes_observing = true;
+        // this.style.visibility = '';
         this._attributes__init();
         this._init();
+        this.attribute__set('Component__hidden');
 
         built_resolve();
     }
@@ -414,6 +427,10 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     _init() {}
 
     async _resources__await() {
+        // if (this.constructor._built_once) return;
+
+        // this.constructor._built_once = true;
+
         let promises = [];
         let resources = this._shadow.querySelectorAll('[Component__awaited]');
 
