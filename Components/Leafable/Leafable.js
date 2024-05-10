@@ -8,7 +8,7 @@ import {SwipeArea} from '../SwipeArea/SwipeArea.js';
 
 export class Leafable extends SwipeArea {
     static _attributes = {
-        ...SwipeArea._attributes,
+        ...super._attributes,
 
         _animation_begin: {
             default: 0,

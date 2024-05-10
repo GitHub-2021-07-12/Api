@@ -8,6 +8,8 @@ import {Model} from '../../Units/Model/Model.js';
 
 export class Repeater extends Component {
     static _attributes = {
+        ...super._attributes,
+
         interpolation: '',
         model: {
             default: 0,
@@ -225,9 +227,6 @@ export class Repeater extends Component {
         this.target.append(...items);
         await this._items__await(items);
 
-        // let promises = items.map((item) => item._built);
-        // await Promise.all(promises);
-
         for (let item of items) {
             item.Repeater__manager.init();
         }
@@ -271,9 +270,6 @@ export class Repeater extends Component {
         this.target.append(...items);
         await this._items__await(items);
 
-        // let promises = items.map((item) => item._built);
-        // await Promise.all(promises);
-
         for (let item of items) {
             item.Repeater__manager?.init();
         }
@@ -298,6 +294,8 @@ export class Repeater extends Component {
         }
 
         this._items_indexes__apply();
+
+        this.event__dispatch('delete');
     }
 
     _items__filter() {
@@ -305,6 +303,8 @@ export class Repeater extends Component {
             let model_item = this.model.get(key);
             this.constructor.attribute__set(item, this.constructor.item_filtered_attribute, model_item._filtered);
         }
+
+        this.event__dispatch('filter');
     }
 
     _items__order() {
@@ -325,6 +325,8 @@ export class Repeater extends Component {
         this.target.append(...items);
 
         this._items_indexes__apply();
+
+        this.event__dispatch('order');
     }
 
     _items_indexes__apply() {

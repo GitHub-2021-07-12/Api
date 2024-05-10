@@ -10,6 +10,8 @@ export class TrackBar extends Component {
     static _components = [Draggable];
 
     static _attributes = {
+        ...super._attributes,
+
         gain: {
             default: 1,
             range: [0, Infinity],

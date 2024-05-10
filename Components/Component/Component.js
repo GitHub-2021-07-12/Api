@@ -7,12 +7,14 @@ import {EventManager} from '../../Units/EventManager/EventManager.js';
 
 
 export class Component extends Class.mix(HTMLElement, EventManager) {
-    static _attributes = {};
-    static _built_already = false;
     static _components = [];
     static _defined = null;
     static _dom = null;
     static _tag = '';
+
+    static _attributes = {
+        _building: false,
+    };
 
 
     static css = '';
@@ -47,7 +49,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         if (!html) return;
 
         let template = document.createElement('template');
-        // template.innerHTML = this.interpolate(html, this.resources, 'resource.');
         template.innerHTML = this.interpolate(html, 'resource', this.resources);
         this._dom = template.content;
 
@@ -65,17 +66,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
             this._dom.prepend(link);
         }
     }
-
-    // static interpolate(string, interpolations, prefix = '') {
-    //     let f = (match, key, value = '') => {
-    //         key = key.replace(prefix, '');
-    //         let interpolation = interpolations[key];
-
-    //         return interpolation instanceof Function ? interpolation(value) : interpolation ?? match;
-    //     };
-
-    //     return string.replace(this.interpolation_regExp, f);
-    // }
 
     static _observedAttributes__define() {
         this.observedAttributes = [];
@@ -329,6 +319,14 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     _shadow = null;
 
 
+    get _building() {
+        return this._attributes._building;
+    }
+    set _building(building) {
+        this._attribute__set('_building', building);
+    }
+
+
     _attribute__get(attribute_name) {
         let attribute_descriptor = this.constructor._attributes[attribute_name];
         let attribute_value_default = attribute_descriptor instanceof Object ? attribute_descriptor.default : attribute_descriptor;
@@ -391,34 +389,26 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         let built_resolve = null;
         this._built = new Promise((resolve) => built_resolve = resolve);
 
+        this._attributes_observing = true;
+        this._attributes__init();
+
         if (this.constructor._dom) {
             this._shadow = this.attachShadow(this.constructor.shadow_opts);
             this._shadow.append(this.constructor._dom.cloneNode(true));
 
-            // this.style.visibility = 'hidden';
+            this._building = true;
             this._elements__define();
             this._slots__define();
-            this.attribute__set('_hidden', true);
 
-            // if (!this.constructor._built_already) {
-                // this.constructor._built_already = true;
+            await Promise.all([
+                this._elements__await(),
+                this._resources__await(),
+            ]);
 
-                await Promise.all([
-                    this._elements__await(),
-                    this._resources__await(),
-                ]);
-            // }
-            // else {
-            //     // await null;
-            // }
+            this._building = false;
         }
 
-        this._attributes_observing = true;
-        // this.style.visibility = '';
-        this._attributes__init();
         await this._init();
-        this.attribute__set('_hidden');
-
         built_resolve();
     }
 
@@ -439,10 +429,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     _init() {}
 
     async _resources__await() {
-        // if (this.constructor._built_already) return;
-
-        // this.constructor._built_already = true;
-
         let promises = [];
         let resources = this._shadow.querySelectorAll('[Component__resource]');
 

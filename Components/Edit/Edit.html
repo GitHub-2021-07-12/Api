@@ -1,23 +1,20 @@
-<div id='root' tabIndex_='-1'>
+<div id='root'>
     <input id='input' part='input' size='1'></input>
-    <div id='button_clear' class='button' part='button button_clear' tabIndex_='-1'>
+    <div id='button_clear' class='button' part='button button_clear'>
         <slot name='button_clear'>
             <svg class='icon'>
-                <!-- <use href='{{resource.button_clear}}'/> -->
                 <use href='{{resource: button_clear}}'/>
             </svg>
         </slot>
     </div>
-    <div id='button_mask' class='button' part='button button_mask' tabIndex_='-1'>
+    <div id='button_mask' class='button' part='button button_mask'>
         <slot name='button_mask__off'>
             <svg class='icon'>
-                <!-- <use href='{{resource.button_mask__off}}'/> -->
                 <use href='{{resource: button_mask__off}}'/>
             </svg>
         </slot>
         <slot name='button_mask__on'>
             <svg class='icon'>
-                <!-- <use href='{{resource.button_mask__on}}'/> -->
                 <use href='{{resource: button_mask__on}}'/>
             </svg>
         </slot>

@@ -3,6 +3,8 @@ import {Component} from '../Component/Component.js';
 
 export class Switch extends Component {
     static _attributes = {
+        ...super._attributes,
+
         _animation: false,
 
         animation_implicit: false,

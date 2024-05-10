@@ -108,13 +108,13 @@
             <button id='toolbar__button_sort'>Sort</button>
         </div>
 
-        <x-repeater id='repeater_1' class='block' model='1' replacement='repeater'>
+        <x-repeater id='repeater_1' class='block' interpolation='repeater' model='1'>
             <template Repeater__delegate>
                 <div class='block' style='background: {{repeater: color}};'>{{repeater: _index}}. {{repeater: radius}}</div>
             </template>
         </x-repeater>
 
-        <x-repeater id='repeater_2' class='block' replacement_='repeater' target='svg'>
+        <x-repeater id='repeater_2' class='block' interpolation_='repeater' target='svg'>
             <template Repeater__delegate>
                 <svg>
                     <!-- <circle id='circle' r='{{repeater: radius}}' fill='{{repeater: color}}' cx='{{repeater: x}}' cy='{{repeater: y}}'></circle> -->

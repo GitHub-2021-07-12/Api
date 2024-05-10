@@ -11,7 +11,7 @@ export class Flickable extends SwipeArea {
     static _components = [TrackBar];
 
     static _attributes = {
-        ...SwipeArea._attributes,
+        ...super._attributes,
 
         _scroll_x: 0,
         _scroll_y: 0,
@@ -349,21 +349,14 @@ export class Flickable extends SwipeArea {
     refresh() {
         if (!this.visible__get()) return;
 
-        // let scrollEdge_x_end_prev = this._scrollEdge_x_end;
-        // let scrollEdge_y_end_prev = this._scrollEdge_y_end;
-        // let scroll_x_prev = this._scroll_x;
-        // let scroll_y_prev = this._scroll_y;
-
         this._scrollBars__refresh();
         this._scrollEdges__define();
 
         if (this.sticky) {
-            // if (!scroll_x_prev || scrollEdge_x_end_prev) {
             if (this._sticky_x) {
                 this.scroll_x = this._scroll_x;
             }
 
-            // if (!scroll_y_prev || scrollEdge_y_end_prev) {
             if (this._sticky_y) {
                 this.scroll_y = this._scroll_y;
             }

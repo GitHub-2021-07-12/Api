@@ -10,6 +10,8 @@ export class TextArea extends Component {
     static _components = [Flickable];
 
     static _attributes = {
+        ...super._attributes,
+
         _focused: false,
 
         disabled: false,

@@ -6,6 +6,8 @@ import {Component} from '../Component/Component.js';
 
 export class Edit extends Component {
     static _attributes = {
+        ...super._attributes,
+
         _focused: false,
         _invalid: false,
 
