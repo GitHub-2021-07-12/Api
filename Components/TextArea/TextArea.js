@@ -18,16 +18,16 @@ export class TextArea extends Component {
         spellCheck: false,
     };
 
-    static _shadow_opts = {
-        ...super._shadow_opts,
-
-        delegatesFocus: true,
-    };
-
 
     static css_url = true;
     static html_url = true;
     static url = import.meta.url;
+
+    static shadow_opts = {
+        ...super.shadow_opts,
+
+        delegatesFocus: true,
+    };
 
 
     static {

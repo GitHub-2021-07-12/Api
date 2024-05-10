@@ -18,7 +18,7 @@
                 padding: 10px;
                 vertical-align: middle;
 
-                &[Repeater__filtered] {
+                &[_Repeater__filtered] {
                     /* display: none; */
                     opacity: 0.2;
                 }
@@ -112,7 +112,7 @@
         <button id='button_sort'>Sort</button>
         <input id='input_filter' placeholder='Filter'></input>
 
-        <x-repeater replacement_='repeater'>
+        <x-repeater interpolation_='repeater'>
             <template Repeater__delegate>
                 <div>
                     <span id='label_index'></span><span>: </span>
@@ -166,7 +166,7 @@
             </template>
         </x-repeater>
 
-        <x-repeater replacement='repeater'>
+        <x-repeater interpolation='repeater'>
             <template Repeater__delegate>
                 <div style='background: {{repeater: data}}'>
                     <span>{{repeater: _index}} - {{repeater: data}} - {{repeater: selected}}</span>
@@ -174,7 +174,7 @@
             </template>
         </x-repeater>
 
-        <x-repeater model='10' replacement='repeater'>
+        <x-repeater model='10' interpolation='repeater'>
             <template Repeater__delegate>
                 <div>{{repeater: _index}} - {{repeater: data}}</div>
             </template>

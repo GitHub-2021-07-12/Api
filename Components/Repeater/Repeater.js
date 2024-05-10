@@ -8,17 +8,17 @@ import {Model} from '../../Units/Model/Model.js';
 
 export class Repeater extends Component {
     static _attributes = {
+        interpolation: '',
         model: {
             default: 0,
             range: [1, Infinity],
         },
-        replacement: '',
         target: '',
     };
 
 
     static delegate_selector = 'template[Repeater__delegate]';
-    static item_filtered_attribute = 'Repeater__filtered';
+    static item_filtered_attribute = '_Repeater__filtered';
     static model_selector = 'template[Repeater__model]';
 
     static Manager = class Manager {
@@ -73,7 +73,7 @@ export class Repeater extends Component {
     _model_eventListeners = {
         add: this._model__on_add.bind(this),
         clear: this._model__on_clear.bind(this),
-        delete: this._model__on_delet.bind(this),
+        delete: this._model__on_delete.bind(this),
         fill: this._model__on_fill.bind(this),
         filter: this._model__on_filter.bind(this),
         order: this._model__on_order.bind(this),
@@ -101,7 +101,14 @@ export class Repeater extends Component {
             this._delegate = arg;
         }
 
-        this._delegate_html = this.replacement && this._delegate?.outerHTML || '';
+        this._delegate_html = this.interpolation && this._delegate?.outerHTML || '';
+    }
+
+    get interpolation() {
+        return this._attributes.interpolation;
+    }
+    set interpolation(interpolation) {
+        this._attribute__set('interpolation', interpolation);
     }
 
     get model() {
@@ -120,13 +127,6 @@ export class Repeater extends Component {
         }
 
         this.refresh();
-    }
-
-    get replacement() {
-        return this._attributes.replacement;
-    }
-    set replacement(replacement) {
-        this._attribute__set('replacement', replacement);
     }
 
     get target() {
@@ -180,9 +180,8 @@ export class Repeater extends Component {
 
         let item = null;
 
-        if (this.replacement) {
-            let f = (match, replacement, path) => replacement == this.replacement ? Common.extract(model_item, path) ?? '' : match;
-            this._item_template.innerHTML = this._delegate_html.replace(this.constructor._interpolation_regExp, f);
+        if (this.interpolation) {
+            this._item_template.innerHTML = this.constructor.interpolate(this._delegate_html, this.interpolation, model_item);
             item = this._item_template.content.children[0];
         }
         else {
@@ -202,7 +201,7 @@ export class Repeater extends Component {
     _item__update(key) {
         if (!this.delegate) return;
 
-        if (this.replacement) {
+        if (this.interpolation) {
             let item_prev = this._items.get(key);
             let item = this._item__create(key);
             item_prev ? item_prev.replaceWith(item) : this.target.append(item);
@@ -213,7 +212,7 @@ export class Repeater extends Component {
         }
     }
 
-    _items__add(model_items) {
+    async _items__add(model_items) {
         if (!this.delegate) return;
 
         let items = [];
@@ -224,10 +223,21 @@ export class Repeater extends Component {
         }
 
         this.target.append(...items);
+        await this._items__await(items);
+
+        // let promises = items.map((item) => item._built);
+        // await Promise.all(promises);
 
         for (let item of items) {
             item.Repeater__manager.init();
         }
+
+        this.event__dispatch('add', {items});
+    }
+
+    async _items__await(items) {
+        let promises = items.map((item) => item._built);
+        await Promise.all(promises);
     }
 
     _items__clear() {
@@ -235,7 +245,7 @@ export class Repeater extends Component {
         this._items.clear();
     }
 
-    _items__define() {
+    async _items__define() {
         if (!this.delegate) return;
 
         let items = [];
@@ -259,14 +269,20 @@ export class Repeater extends Component {
         }
 
         this.target.append(...items);
+        await this._items__await(items);
+
+        // let promises = items.map((item) => item._built);
+        // await Promise.all(promises);
 
         for (let item of items) {
             item.Repeater__manager?.init();
         }
+
+        this.event__dispatch('define', {items});
     }
 
     _items__delete(model_items) {
-        if (this.replacement) {
+        if (this.interpolation) {
             this._items__define();
 
             return;
@@ -292,7 +308,7 @@ export class Repeater extends Component {
     }
 
     _items__order() {
-        if (this.replacement) {
+        if (this.interpolation) {
             this._items__define();
 
             return;
@@ -325,7 +341,7 @@ export class Repeater extends Component {
         this._items__clear();
     }
 
-    _model__on_delet(event) {
+    _model__on_delete(event) {
         this._items__delete(event.detail.items);
     }
 

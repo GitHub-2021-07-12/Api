@@ -21,12 +21,6 @@ export class Edit extends Component {
         template_char: '_',
     };
 
-    static _shadow_opts = {
-        ...super._shadow_opts,
-
-        delegatesFocus: true,
-    };
-
 
     static css_url = true;
     static html_url = true;
@@ -36,6 +30,12 @@ export class Edit extends Component {
         button_clear: new URL(`${this.name}.svg#cross`, this.url),
         button_mask__off: new URL(`${this.name}.svg#eye_open`, this.url),
         button_mask__on: new URL(`${this.name}.svg#eye_closed`, this.url),
+    };
+
+    static shadow_opts = {
+        ...super.shadow_opts,
+
+        delegatesFocus: true,
     };
 
 

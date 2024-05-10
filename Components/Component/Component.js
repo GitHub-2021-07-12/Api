@@ -8,22 +8,22 @@ import {EventManager} from '../../Units/EventManager/EventManager.js';
 
 export class Component extends Class.mix(HTMLElement, EventManager) {
     static _attributes = {};
-    static _built_once = false;
+    static _built_already = false;
     static _components = [];
     static _defined = null;
     static _dom = null;
-    static _interpolation_regExp = /{{\s*(?<key>.*?)(?:\s*:\s*(?<value>.*?))?\s*}}/g;
-    static _shadow_opts = {mode: 'closed'};
     static _tag = '';
-    static _tag_prefix = 'x';
 
 
     static css = '';
     static css_url = '';
     static html = '';
     static html_url = '';
+    static interpolation_regExp = /{{\s*(?<key>.*?)(?:\s*:\s*(?<value>.*?))?\s*}}/g;
     static observedAttributes = [];
     static resources = {};
+    static shadow_opts = {mode: 'closed'};
+    static tag_prefix = 'x';
     static url = '';
 
 
@@ -47,33 +47,35 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         if (!html) return;
 
         let template = document.createElement('template');
-        template.innerHTML = this._interpolate(html, this.resources);
+        // template.innerHTML = this.interpolate(html, this.resources, 'resource.');
+        template.innerHTML = this.interpolate(html, 'resource', this.resources);
         this._dom = template.content;
 
         if (this.css) {
             let style = document.createElement('style');
             style.textContent = this.css;
-            style.setAttribute('Component__awaited', '');
+            style.setAttribute('Component__resource', '');
             this._dom.prepend(style);
         }
         else if (this.css_url) {
             let link = document.createElement('link');
             link.href = this.css_url === true ? new URL(`${this.name}.css`, this.url) : this.css_url;
             link.rel = 'stylesheet';
-            link.setAttribute('Component__awaited', '');
+            link.setAttribute('Component__resource', '');
             this._dom.prepend(link);
         }
     }
 
-    static _interpolate(string, interpolations) {
-        let f = (match, key, value = '') => {
-            let interpolation = interpolations[key];
+    // static interpolate(string, interpolations, prefix = '') {
+    //     let f = (match, key, value = '') => {
+    //         key = key.replace(prefix, '');
+    //         let interpolation = interpolations[key];
 
-            return interpolation instanceof Function ? interpolation(value) : interpolation ?? match;
-        };
+    //         return interpolation instanceof Function ? interpolation(value) : interpolation ?? match;
+    //     };
 
-        return string.replace(this._interpolation_regExp, f);
-    }
+    //     return string.replace(this.interpolation_regExp, f);
+    // }
 
     static _observedAttributes__define() {
         this.observedAttributes = [];
@@ -130,7 +132,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     static async define() {
         if (customElements.getName(this)) return;
 
-        this._tag = `${this._tag_prefix}-${this.name}`.toLowerCase();
+        this._tag = `${this.tag_prefix}-${this.name}`.toLowerCase();
         this._defined = customElements.whenDefined(this._tag);
         this._observedAttributes__define();
 
@@ -192,6 +194,16 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     static identifier__to_hyphen(identifier) {
         return identifier.replace(/[A-Z]/g, '-$&').toLowerCase();
+    }
+
+    static interpolate(string, key, interpolations) {
+        let f = (match, string_key, string_value) => {
+            if (string_key != key) return match;
+
+            return Common.extract(interpolations, string_value) ?? '';
+        };
+
+        return string.replace(this.interpolation_regExp, f);
     }
 
     static left__get(element) {
@@ -380,32 +392,32 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         this._built = new Promise((resolve) => built_resolve = resolve);
 
         if (this.constructor._dom) {
-            this._shadow = this.attachShadow(this.constructor._shadow_opts);
+            this._shadow = this.attachShadow(this.constructor.shadow_opts);
             this._shadow.append(this.constructor._dom.cloneNode(true));
 
             // this.style.visibility = 'hidden';
             this._elements__define();
             this._slots__define();
-            this.attribute__set('Component__hidden', true);
+            this.attribute__set('_hidden', true);
 
-            if (!this.constructor._built_once) {
-                this.constructor._built_once = true;
+            // if (!this.constructor._built_already) {
+                // this.constructor._built_already = true;
 
                 await Promise.all([
                     this._elements__await(),
                     this._resources__await(),
                 ]);
-            }
-            else {
-                await Promise.resolve();
-            }
+            // }
+            // else {
+            //     // await null;
+            // }
         }
 
         this._attributes_observing = true;
         // this.style.visibility = '';
         this._attributes__init();
-        this._init();
-        this.attribute__set('Component__hidden');
+        await this._init();
+        this.attribute__set('_hidden');
 
         built_resolve();
     }
@@ -427,12 +439,12 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     _init() {}
 
     async _resources__await() {
-        // if (this.constructor._built_once) return;
+        // if (this.constructor._built_already) return;
 
-        // this.constructor._built_once = true;
+        // this.constructor._built_already = true;
 
         let promises = [];
-        let resources = this._shadow.querySelectorAll('[Component__awaited]');
+        let resources = this._shadow.querySelectorAll('[Component__resource]');
 
         for (let resource of resources) {
             let promise_resolve = null;
