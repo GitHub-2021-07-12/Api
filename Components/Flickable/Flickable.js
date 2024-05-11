@@ -313,7 +313,7 @@ export class Flickable extends SwipeArea {
         if (this._scroll_x) {
             this._elements.scrollBar_x.track_length__define();
             let puck_x__length = Math.round(this._slots.display.clientWidth / this._slots.display.scrollWidth * this._elements.scrollBar_x._track_length);
-            this.style.setProperty('--_puck_x__length', puck_x__length);
+            this.style.setProperty('--_Flickable__puck_x__length', puck_x__length);
             this._elements.scrollBar_x.puck_length__define();
 
             this._elements.scrollBar_x.value_max = 0;
@@ -323,7 +323,7 @@ export class Flickable extends SwipeArea {
         if (this._scroll_y) {
             this._elements.scrollBar_y.track_length__define();
             let puck_y__length = Math.round(this._slots.display.clientHeight / this._slots.display.scrollHeight * this._elements.scrollBar_y._track_length);
-            this.style.setProperty('--_puck_y__length', puck_y__length);
+            this.style.setProperty('--_Flickable__puck_y__length', puck_y__length);
             this._elements.scrollBar_y.puck_length__define();
 
             this._elements.scrollBar_y.value_max = 0;

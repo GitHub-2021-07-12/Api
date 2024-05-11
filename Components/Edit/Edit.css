@@ -1,8 +1,8 @@
 @layer init {
     :host {
-        --gap: 4px;
-        --placeholder_color: currentColor;
-        --placeholder_opacity: 0.4;
+        --Edit__gap: 4px;
+        --Edit__placeholder_color: currentColor;
+        --Edit__placeholder_opacity: 0.4;
 
         border: 1px solid #888;
         border-radius: 2px;
@@ -85,8 +85,8 @@
         padding: 0;
 
         &::placeholder {
-            color: var(--placeholder_color);
-            opacity: var(--placeholder_opacity);
+            color: var(--Edit__placeholder_color);
+            opacity: var(--Edit__placeholder_opacity);
         }
     }
 
@@ -94,7 +94,7 @@
         align-items: center;
         box-sizing: border-box;
         display: grid;
-        gap: var(--gap);
+        gap: var(--Edit__gap);
         grid-auto-columns: auto min-content min-content;
         grid-auto-flow: column;
         height: 100%;

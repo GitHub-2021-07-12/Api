@@ -1,25 +1,25 @@
 @layer init {
     :host {
-        --_track__rounding: calc(var(--rounding) - var(--padding));
+        --_TrackBar__track__rounding: calc(var(--TrackBar__rounding) - var(--TrackBar__padding));
 
 
-        --length: 100px;
-        --padding: 0px;
-        --puck__length: var(--width);
-        --rounding: 0px;
-        --width: 20px;
+        --TrackBar__length: 100px;
+        --TrackBar__padding: 0px;
+        --TrackBar__puck__length: var(--TrackBar__width);
+        --TrackBar__rounding: 0px;
+        --TrackBar__width: 20px;
 
         background: #0002;
-        border-radius: var(--rounding);
+        border-radius: var(--TrackBar__rounding);
         box-sizing: border-box !important;
         display: block;
-        height: var(--width) !important;
-        padding: var(--padding) !important;
-        width: var(--length) !important;
+        height: var(--TrackBar__width) !important;
+        padding: var(--TrackBar__padding) !important;
+        width: var(--TrackBar__length) !important;
     }
     :host([vertical]) {
-        height: var(--length) !important;
-        width: var(--width) !important;
+        height: var(--TrackBar__length) !important;
+        width: var(--TrackBar__width) !important;
     }
 
 
@@ -30,16 +30,16 @@
 
     #puck {
         background: #0002;
-        border-radius: var(--_track__rounding);
+        border-radius: var(--_TrackBar__track__rounding);
         bottom: 0 !important;
         left: 0;
         position: absolute !important;
         right: 0 !important;
         top: 0;
-        width: var(--puck__length) !important;
+        width: var(--TrackBar__puck__length) !important;
 
         :host([vertical]) & {
-            height: var(--puck__length) !important;
+            height: var(--TrackBar__puck__length) !important;
             width: auto !important;
         }
     }
@@ -49,7 +49,7 @@
     }
 
     #track {
-        border-radius: var(--_track__rounding);
+        border-radius: var(--_TrackBar__track__rounding);
         height: 100% !important;
         position: relative !important;
         width: 100% !important;
