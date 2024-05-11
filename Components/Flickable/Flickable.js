@@ -253,8 +253,8 @@ export class Flickable extends SwipeArea {
         this._animationFrame = requestAnimationFrame(this._scrollBars_values__define);
 
         this._scrollEdges__define();
-        this._sticky_x = this._scrollEdge_x_end;
-        this._sticky_y = this._scrollEdge_y_end;
+        this._sticky_x = this._scrollEdge_x_end || !this._scroll_x;
+        this._sticky_y = this._scrollEdge_y_end || !this._scroll_y;
     }
 
     _on_swipe(event) {
