@@ -16,13 +16,11 @@ export class Common {
     }
 
     static extract(object, path) {
-        if (!object || typeof path != 'string') return null;
-
         let aim = object;
         let props = path.split('.');
 
         for (let prop of props) {
-            if (!(aim instanceof Object)) return null;
+            if (!(aim instanceof Object)) return undefined;
 
             aim = aim[prop];
         }

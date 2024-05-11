@@ -7,7 +7,7 @@ import {Vector_2d} from '../../Units/Vector_2d/Vector_2d.js';
 
 export class Draggable extends SwipeArea {
     static _attributes = {
-        ...SwipeArea._attributes,
+        ...super._attributes,
 
         axis: {
             default: '',
@@ -36,7 +36,7 @@ export class Draggable extends SwipeArea {
 
 
     static {
-        this.init();
+        this.define();
     }
 
 

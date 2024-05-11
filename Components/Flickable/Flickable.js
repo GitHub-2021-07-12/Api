@@ -9,12 +9,9 @@ import {Vector_2d} from '../../Units/Vector_2d/Vector_2d.js';
 
 export class Flickable extends SwipeArea {
     static _components = [TrackBar];
-    static _css = true;
-    static _html = true;
-    static _url = import.meta.url;
 
     static _attributes = {
-        ...SwipeArea._attributes,
+        ...super._attributes,
 
         _scroll_x: 0,
         _scroll_y: 0,
@@ -48,8 +45,13 @@ export class Flickable extends SwipeArea {
     };
 
 
+    static css_url = true;
+    static html_url = true;
+    static url = import.meta.url;
+
+
     static {
-        this.init();
+        this.define();
     }
 
 
@@ -61,6 +63,8 @@ export class Flickable extends SwipeArea {
     _scroll_x_initial = 0;
     _scroll_y_factor = 0;
     _scroll_y_initial = 0;
+    _sticky_x = true;
+    _sticky_y = true;
     _velocity = new Vector_2d();
     _velocity_prev = new Vector_2d();
 
@@ -249,6 +253,8 @@ export class Flickable extends SwipeArea {
         this._animationFrame = requestAnimationFrame(this._scrollBars_values__define);
 
         this._scrollEdges__define();
+        this._sticky_x = this._scrollEdge_x_end || !this._scroll_x;
+        this._sticky_y = this._scrollEdge_y_end || !this._scroll_y;
     }
 
     _on_swipe(event) {
@@ -307,7 +313,7 @@ export class Flickable extends SwipeArea {
         if (this._scroll_x) {
             this._elements.scrollBar_x.track_length__define();
             let puck_x__length = Math.round(this._slots.display.clientWidth / this._slots.display.scrollWidth * this._elements.scrollBar_x._track_length);
-            this.style.setProperty('--_puck_x__length', puck_x__length);
+            this.style.setProperty('--_Flickable__puck_x__length', puck_x__length);
             this._elements.scrollBar_x.puck_length__define();
 
             this._elements.scrollBar_x.value_max = 0;
@@ -317,7 +323,7 @@ export class Flickable extends SwipeArea {
         if (this._scroll_y) {
             this._elements.scrollBar_y.track_length__define();
             let puck_y__length = Math.round(this._slots.display.clientHeight / this._slots.display.scrollHeight * this._elements.scrollBar_y._track_length);
-            this.style.setProperty('--_puck_y__length', puck_y__length);
+            this.style.setProperty('--_Flickable__puck_y__length', puck_y__length);
             this._elements.scrollBar_y.puck_length__define();
 
             this._elements.scrollBar_y.value_max = 0;
@@ -343,20 +349,15 @@ export class Flickable extends SwipeArea {
     refresh() {
         if (!this.visible__get()) return;
 
-        let scrollEdge_x_end_prev = this._scrollEdge_x_end;
-        let scrollEdge_y_end_prev = this._scrollEdge_y_end;
-        let scroll_x_prev = this._scroll_x;
-        let scroll_y_prev = this._scroll_y;
-
         this._scrollBars__refresh();
         this._scrollEdges__define();
 
         if (this.sticky) {
-            if (!scroll_x_prev || scrollEdge_x_end_prev) {
+            if (this._sticky_x) {
                 this.scroll_x = this._scroll_x;
             }
 
-            if (!scroll_y_prev || scrollEdge_y_end_prev) {
+            if (this._sticky_y) {
                 this.scroll_y = this._scroll_y;
             }
         }

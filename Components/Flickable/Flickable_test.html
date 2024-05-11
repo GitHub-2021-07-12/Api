@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 
+
 <html>
     <head>
         <meta charset='utf-8'>
@@ -7,8 +8,12 @@
         <title>Flickable</title>
 
         <style>
-            :not(:defined) {
-                display: none;
+            /* :not(:defined) { */
+            /*     display: none; */
+            /* } */
+
+            :root {
+                background: #0002;
             }
 
             body {
@@ -30,6 +35,7 @@
 
 
             textArea {
+                background: transparent;
                 border: none;
                 margin: 0;
                 outline: none;
@@ -40,8 +46,10 @@
 
             x-flickable {
                 --gap: 4px;
+                --puck__margin_outer: 10px;
                 border: 1px solid #444;
                 font: 24px 'Arial';
+                overflow-y: clip;
 
                 &::part(content) {
                     margin: 20px;
@@ -59,10 +67,7 @@
         </style>
 
         <script type='module'>
-            import {Flickable} from './Flickable.js';
-
-
-            await Flickable._defined;
+            let {Flickable} = await import('./Flickable.js');
 
 
             let root = document.querySelector('#root');
@@ -75,7 +80,11 @@
             window.flickables = document.querySelectorAll('x-flickable');
             window.textArea = document.querySelector('textArea');
 
-            // flickables[0].textContent = Array(100).join(flickables[0].textContent);
+            await Flickable._defined;
+            await Promise.all([...flickables].map((item) => item._built));
+
+            document.body.hidden = false;
+
             textArea.value = Array(100).join(flickables[1].textContent);
             flickables[0].refresh();
             flickables[1].textContent = Array(100).join(flickables[1].textContent);
@@ -83,7 +92,7 @@
         </script>
     </head>
 
-    <body>
+    <body hidden>
         <div id='root'>
             <x-flickable disabled>
                 <textArea slot='display' spellCheck='false'></textArea>

@@ -39,10 +39,13 @@
 
         <script type='module'>
             let {TextArea} = await import('./TextArea.js');
-            await TextArea._defined;
 
 
             let textAreas = document.querySelectorAll('x-textArea');
+
+            await TextArea._defined;
+            await Promise.all([...textAreas].map((item) => item._built));
+
             textAreas[0].value = 123;
         </script>
     </head>

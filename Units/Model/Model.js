@@ -139,7 +139,7 @@ export class Model extends EventManager {
 
         if (!this.events_dispatch) return;
 
-        this.event__dispatch('fill');
+        this.event__dispatch('filter');
     }
 
     get(key) {

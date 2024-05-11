@@ -1,12 +1,12 @@
 @layer init {
     :host {
-        --gap: 0px;
-        --placeholder_color: currentColor;
-        --placeholder_opacity: 0.4;
-        --puck__length_min: 20%;
-        --puck__margin_inner: 2px;
-        --puck__margin_outer: 2px;
-        --scrollBar__width: 10px;
+        --TextArea__gap: 0px;
+        --TextArea__placeholder_color: currentColor;
+        --TextArea__placeholder_opacity: 0.4;
+        --TextArea__puck__length_min: 20%;
+        --TextArea__puck__margin_inner: 2px;
+        --TextArea__puck__margin_outer: 2px;
+        --TextArea__scrollBar__width: 10px;
 
         border-radius: 2px;
         border: 1px solid #888;
@@ -38,17 +38,17 @@
         resize: none !important;
 
         &::placeholder {
-            color: var(--placeholder_color);
-            opacity: var(--placeholder_opacity);
+            color: var(--TextArea__placeholder_color);
+            opacity: var(--TextArea__placeholder_opacity);
         }
     }
 
     #root {
-        --gap: inherit;
-        --puck__length_min: inherit;
-        --puck__margin_inner: inherit;
-        --puck__margin_outer: inherit;
-        --scrollBar__width: inherit;
+        --Flickable__gap: var(--TextArea__gap);
+        --Flickable__puck__length_min: var(--TextArea__puck__length_min);
+        --Flickable__puck__margin_inner: var(--TextArea__puck__margin_inner);
+        --Flickable__puck__margin_outer: var(--TextArea__puck__margin_outer);
+        --Flickable__scrollBar__width: var(--TextArea__scrollBar__width);
         height: 100%;
     }
 }

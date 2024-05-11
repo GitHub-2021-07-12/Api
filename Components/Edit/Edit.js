@@ -5,11 +5,9 @@ import {Component} from '../Component/Component.js';
 
 
 export class Edit extends Component {
-    static _css = true;
-    static _html = true;
-    static _url = import.meta.url;
-
     static _attributes = {
+        ...super._attributes,
+
         _focused: false,
         _invalid: false,
 
@@ -25,15 +23,26 @@ export class Edit extends Component {
         template_char: '_',
     };
 
-    static _shadow_opts = {
-        ...super._shadow_opts,
+
+    static css_url = true;
+    static html_url = true;
+    static url = import.meta.url;
+
+    static resources = {
+        button_clear: new URL(`${this.name}.svg#cross`, this.url),
+        button_mask__off: new URL(`${this.name}.svg#eye_open`, this.url),
+        button_mask__on: new URL(`${this.name}.svg#eye_closed`, this.url),
+    };
+
+    static shadow_opts = {
+        ...super.shadow_opts,
 
         delegatesFocus: true,
     };
 
 
     static {
-        this.init();
+        this.define();
     }
 
 

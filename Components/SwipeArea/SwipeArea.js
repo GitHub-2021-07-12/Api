@@ -19,6 +19,8 @@ export class SwipeArea extends Component {
     };
 
     static _attributes = {
+        ...super._attributes,
+
         _swipe: false,
 
         disabled: false,
@@ -39,7 +41,7 @@ export class SwipeArea extends Component {
 
 
     static {
-        this.init();
+        this.define();
     }
 
 

@@ -7,12 +7,8 @@ import {SwipeArea} from '../SwipeArea/SwipeArea.js';
 
 
 export class Leafable extends SwipeArea {
-    static _css = true;
-    static _html = true;
-    static _url = import.meta.url;
-
     static _attributes = {
-        ...SwipeArea._attributes,
+        ...super._attributes,
 
         _animation_begin: {
             default: 0,
@@ -49,18 +45,21 @@ export class Leafable extends SwipeArea {
         vertical: false,
     };
 
-    static _shadow_opts = {
-        ...SwipeArea._shadow_opts,
+
+    static animations_duration_special = 1e10;
+    static css_url = true;
+    static html_url = true;
+    static url = import.meta.url;
+
+    static shadow_opts = {
+        ...SwipeArea.shadow_opts,
 
         slotAssignment: 'manual',
     };
 
 
-    static animations_duration_special = 1e10;
-
-
     static {
-        this.init();
+        this.define();
     }
 
 

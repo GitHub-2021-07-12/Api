@@ -7,12 +7,11 @@ import {Flickable} from '../Flickable/Flickable.js';
 
 
 export class TextArea extends Component {
-    static _css = true;
-    static _html = true;
     static _components = [Flickable];
-    static _url = import.meta.url;
 
     static _attributes = {
+        ...super._attributes,
+
         _focused: false,
 
         disabled: false,
@@ -21,15 +20,20 @@ export class TextArea extends Component {
         spellCheck: false,
     };
 
-    static _shadow_opts = {
-        ...super._shadow_opts,
+
+    static css_url = true;
+    static html_url = true;
+    static url = import.meta.url;
+
+    static shadow_opts = {
+        ...super.shadow_opts,
 
         delegatesFocus: true,
     };
 
 
     static {
-        this.init();
+        this.define();
     }
 
 
