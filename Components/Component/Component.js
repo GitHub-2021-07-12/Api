@@ -23,6 +23,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     static html_url = '';
     static interpolation_regExp = /{{\s*(?<key>.*?)(?:\s*:\s*(?<value>.*?))?\s*}}/g;
     static observedAttributes = [];
+    static resource_awaited_selector = 'link, style';
     static resources = {};
     static shadow_opts = {mode: 'closed'};
     static tag_prefix = 'x';
@@ -55,14 +56,12 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         if (this.css) {
             let style = document.createElement('style');
             style.textContent = this.css;
-            style.setAttribute('Component__resource', '');
             this._dom.prepend(style);
         }
         else if (this.css_url) {
             let link = document.createElement('link');
             link.href = this.css_url === true ? new URL(`${this.name}.css`, this.url) : this.css_url;
             link.rel = 'stylesheet';
-            link.setAttribute('Component__resource', '');
             this._dom.prepend(link);
         }
     }
@@ -430,17 +429,24 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     async _resources__await() {
         let promises = [];
-        let resources = this._shadow.querySelectorAll('[Component__resource]');
+        let resources = this._shadow.querySelectorAll(this.constructor.resource_awaited_selector);
 
         for (let resource of resources) {
+            if (!resource.href || resource.href == location.href) continue;
+
+            let promise_reject = null;
             let promise_resolve = null;
-            let promise = new Promise((resolve) => promise_resolve = resolve);
+            let promise = new Promise((resolve, reject) => {
+                promise_reject = reject;
+                promise_resolve = resolve;
+            });
             promises.push(promise);
 
-            resource.addEventListener('load', () => promise_resolve(), {once: true});
+            resource.addEventListener('error', promise_reject, {once: true});
+            resource.addEventListener('load', promise_resolve, {once: true});
         }
 
-        await Promise.all(promises);
+        await Promise.allSettled(promises);
     }
 
     _slots__define() {

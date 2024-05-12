@@ -39,9 +39,7 @@
                     content: '';
                     display: block;
                     inset: 0;
-                    /* mask: center no-repeat url('./Edit.svg#cross'); */
-                    /* mask: center no-repeat url('./Edit.svg#cat'); */
-                    mask: center no-repeat url('./Edit.svg#twitter');
+                    mask: center no-repeat url('./Edit.svg#eye_open');
                     position: absolute;
                 }
                 &::part(button_clear):hover::after {
@@ -71,7 +69,7 @@
             await Promise.all([...edits].map((item) => item._built));
 
             edits[0].value = '123';
-            edits[1].value = 'q👨‍👩‍👧‍👦e';
+            // edits[1].value = 'q👨‍👩‍👧‍👦e';
         </script>
     </head>
 
@@ -92,9 +90,9 @@
             <meta slot='button_clear'>
         </x-edit>
 
-        <x-edit id='edit_2' button_clear button_mask disabled_ mask_char='⭐' masked></x-edit>
+        <!-- <x-edit id='edit_2' button_clear button_mask disabled_ mask_char='⭐' masked></x-edit> -->
 
-        <input disabled value='qqq⭐⭐⭐eee'></input>
-        <input placeholder='password' type='password'></input>
+        <!-- <input disabled value='qqq⭐⭐⭐eee'></input> -->
+        <!-- <input placeholder='password' type='password'></input> -->
     </body>
 </html>
