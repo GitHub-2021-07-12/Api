@@ -20,7 +20,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     static css = '';
     static css_url = '';
-    static elements_classes = [];
+    static elements_classes = {};
     static html = '';
     static html_url = '';
     static interpolation_regExp = /{{\s*(?<key>.*?)(?:\s*:\s*(?<value>.*?))?\s*}}/g;
@@ -418,15 +418,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         await Promise.all(promises);
     }
 
-    // _elements__define() {
-    //     let elements = this._shadow.querySelectorAll('[id]');
-    //     this._elements = {};
-
-    //     for (let element of elements) {
-    //         this._elements[element.id] = element;
-    //     }
-    // }
-
     _elements__define() {
         this._elements = {};
 
@@ -455,7 +446,14 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
             }
         }
 
-        // console.log(this._elements)
+        for (let [key, value] of Object.entries(this.constructor.elements_classes)) {
+            let element = this._elements[key];
+            let cssClasses = value.split?.(/\s+/) || value;
+
+            for (let cssClass of cssClasses) {
+                element.classList.add(cssClass);
+            }
+        }
     }
 
     _init() {}
