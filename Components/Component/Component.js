@@ -10,6 +10,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     static _components = [];
     static _defined = null;
     static _dom = null;
+    static _elements = {};
     static _tag = '';
 
     static _attributes = {
@@ -19,6 +20,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     static css = '';
     static css_url = '';
+    static elements_classes = [];
     static html = '';
     static html_url = '';
     static interpolation_regExp = /{{\s*(?<key>.*?)(?:\s*:\s*(?<value>.*?))?\s*}}/g;
@@ -416,13 +418,44 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         await Promise.all(promises);
     }
 
+    // _elements__define() {
+    //     let elements = this._shadow.querySelectorAll('[id]');
+    //     this._elements = {};
+
+    //     for (let element of elements) {
+    //         this._elements[element.id] = element;
+    //     }
+    // }
+
     _elements__define() {
-        let elements = this._shadow.querySelectorAll('[id]');
         this._elements = {};
 
-        for (let element of elements) {
-            this._elements[element.id] = element;
+        for (let [key, value] of Object.entries(this.constructor._elements)) {
+            if (value instanceof Array) {
+                let elements = [];
+                let selectors = value;
+
+                for (let selector of selectors) {
+                    elements.push(...this._shadow.querySelectorAll(selector));
+                }
+
+                this._elements[key] = elements;
+            }
+            else {
+                let selector = value;
+
+                if (!selector) {
+                    selector = `.${key}`;
+                }
+                else if (selector.length == 1) {
+                    selector = `${selector}${key}`;
+                }
+
+                this._elements[key] = this._shadow.querySelector(selector);
+            }
         }
+
+        // console.log(this._elements)
     }
 
     _init() {}

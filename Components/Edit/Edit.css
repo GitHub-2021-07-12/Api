@@ -51,6 +51,18 @@
         }
     }
 
+    .button_clear {
+        :host([button_clear]:not([disabled])) & {
+            display: block !important;
+        }
+    }
+
+    .button_mask {
+        :host([button_mask]:not([disabled])) & {
+            display: block !important;
+        }
+    }
+
     .icon {
         display: block;
         fill: none;
@@ -61,20 +73,7 @@
         width: 100%;
     }
 
-
-    #button_clear {
-        :host([button_clear]:not([disabled])) & {
-            display: block !important;
-        }
-    }
-
-    #button_mask {
-        :host([button_mask]:not([disabled])) & {
-            display: block !important;
-        }
-    }
-
-    #input {
+    .input {
         align-self: stretch !important;
         background: transparent;
         border: none;
@@ -90,7 +89,7 @@
         }
     }
 
-    #root {
+    .root {
         align-items: center;
         box-sizing: border-box;
         display: grid;

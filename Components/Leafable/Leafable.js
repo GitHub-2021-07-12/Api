@@ -45,6 +45,11 @@ export class Leafable extends SwipeArea {
         vertical: false,
     };
 
+    static _elements = {
+        item_current: '',
+        item_prev: '',
+    };
+
 
     static animations_duration_special = 1e10;
     static css_url = true;

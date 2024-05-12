@@ -23,6 +23,12 @@ export class Edit extends Component {
         template_char: '_',
     };
 
+    static _elements = {
+        input: '',
+        button_clear: '',
+        button_mask: '',
+    };
+
 
     static css_url = true;
     static html_url = true;

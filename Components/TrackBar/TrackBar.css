@@ -23,12 +23,12 @@
     }
 
 
-    #handle {
+    .handle {
         inset: 0 !important;
         position: absolute !important;
     }
 
-    #puck {
+    .puck {
         background: #0002;
         border-radius: var(--_TrackBar__track__rounding);
         bottom: 0 !important;
@@ -44,11 +44,11 @@
         }
     }
 
-    #root {
+    .root {
         display: contents;
     }
 
-    #track {
+    .track {
         border-radius: var(--_TrackBar__track__rounding);
         height: 100% !important;
         position: relative !important;

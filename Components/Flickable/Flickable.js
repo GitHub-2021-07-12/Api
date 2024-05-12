@@ -44,6 +44,11 @@ export class Flickable extends SwipeArea {
         },
     };
 
+    static _elements = {
+        scrollBar_x: '',
+        scrollBar_y: '',
+    };
+
 
     static css_url = true;
     static html_url = true;

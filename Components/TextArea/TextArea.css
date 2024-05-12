@@ -25,7 +25,16 @@
     }
 
 
-    #input {
+    .flickable {
+        --Flickable__gap: var(--TextArea__gap);
+        --Flickable__puck__length_min: var(--TextArea__puck__length_min);
+        --Flickable__puck__margin_inner: var(--TextArea__puck__margin_inner);
+        --Flickable__puck__margin_outer: var(--TextArea__puck__margin_outer);
+        --Flickable__scrollBar__width: var(--TextArea__scrollBar__width);
+        height: 100%;
+    }
+
+    .input {
         background: transparent !important;
         border: none !important;
         color: inherit;
@@ -43,12 +52,7 @@
         }
     }
 
-    #root {
-        --Flickable__gap: var(--TextArea__gap);
-        --Flickable__puck__length_min: var(--TextArea__puck__length_min);
-        --Flickable__puck__margin_inner: var(--TextArea__puck__margin_inner);
-        --Flickable__puck__margin_outer: var(--TextArea__puck__margin_outer);
-        --Flickable__scrollBar__width: var(--TextArea__scrollBar__width);
-        height: 100%;
+    .root {
+        display: contents;
     }
 }

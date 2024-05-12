@@ -20,6 +20,11 @@ export class TextArea extends Component {
         spellCheck: false,
     };
 
+    static _elements = {
+        flickable: '',
+        input: '',
+    };
+
 
     static css_url = true;
     static html_url = true;
@@ -154,7 +159,7 @@ export class TextArea extends Component {
 
         if (this._elements.input.scrollHeight == this._input_scrollHeight_prev && this._elements.input.scrollWidth == this._input_scrollWidth_prev) return;
 
-        this._elements.root.refresh();
+        this._elements.flickable.refresh();
         this.event__dispatch('resize');
     }
 
@@ -167,6 +172,6 @@ export class TextArea extends Component {
 
     refresh() {
         this._height__define();
-        this._elements.root.refresh();
+        this._elements.flickable.refresh();
     }
 }

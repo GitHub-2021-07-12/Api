@@ -36,7 +36,7 @@
     }
 
 
-    #puck {
+    .puck {
         background: #fff;
         border-radius: var(--_Switch__puck__length);
         bottom: 0 !important;
@@ -67,12 +67,12 @@
         }
     }
 
-    #root {
+    .root {
         display: contents;
         transition: inherit;
     }
 
-    #track {
+    .track {
         border-radius: calc(var(--Switch__rounding) - var(--Switch__padding));
         height: 100% !important;
         position: relative !important;

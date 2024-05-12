@@ -27,23 +27,12 @@
     }
 
 
-    .scrollBar {
-        --TrackBar__length: auto !important;
-        --TrackBar__padding: var(--Flickable__scrollBar__padding);
-        --TrackBar__rounding: var(--TrackBar__width);
-        --TrackBar__width: var(--Flickable__scrollBar__width) !important;
-        background: transparent;
-        border-radius: 0;
-        display: none !important;
-    }
-
-
-    #content {
+    .content {
         box-sizing: border-box !important;
         display: inline-block;
     }
 
-    #display {
+    .display {
         display: block !important;
         overflow: auto !important;
         scrollbar-width: none !important;
@@ -54,7 +43,7 @@
         }
     }
 
-    #root {
+    .root {
         display: grid;
         gap: var(--Flickable__gap);
         height: 100%;
@@ -73,7 +62,17 @@
         }
     }
 
-    #scrollBar_x {
+    .scrollBar {
+        --TrackBar__length: auto !important;
+        --TrackBar__padding: var(--Flickable__scrollBar__padding);
+        --TrackBar__rounding: var(--TrackBar__width);
+        --TrackBar__width: var(--Flickable__scrollBar__width) !important;
+        background: transparent;
+        border-radius: 0;
+        display: none !important;
+    }
+
+    .scrollBar_x {
         --TrackBar__puck__length: max(var(--Flickable__puck__length_min), var(--_Flickable__puck_x__length) * 1px);
         overflow-x: clip !important;
 
@@ -93,7 +92,7 @@
         }
     }
 
-    #scrollBar_y {
+    .scrollBar_y {
         --TrackBar__puck__length: max(var(--Flickable__puck__length_min), var(--_Flickable__puck_y__length) * 1px);
         overflow-y: clip !important;
 

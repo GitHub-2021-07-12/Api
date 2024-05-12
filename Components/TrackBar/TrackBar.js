@@ -36,6 +36,11 @@ export class TrackBar extends Component {
         vertical: false,
     };
 
+    static _elements = {
+        puck: '',
+        track: '',
+    };
+
 
     static css_url = true;
     static html_url = true;
