@@ -3,7 +3,7 @@
 // 13.04.2022
 
 
-require_once __dir__ . '/../Json.php';
+require_once __dir__ . '/../Json/Json.php';
 
 
 class Rest {
