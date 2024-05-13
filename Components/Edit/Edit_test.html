@@ -63,6 +63,12 @@
 
             window.edits = document.querySelectorAll('x-edit');
 
+            // Edit.elements_classes.button_clear = 'a b c';
+            // Edit.elements_classes.input = ['a', 'b', 'c'];
+            Edit.elements_classes = {
+                button_clear: 'a b c',
+                input: ['a', 'b', 'c'],
+            };
             Edit.resources.button_mask__on = './Edit.svg#eye_open';
 
             await Edit._defined;

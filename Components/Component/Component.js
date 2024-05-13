@@ -55,6 +55,11 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         template.innerHTML = this.interpolate(html, 'resource', this.resources);
         this._dom = template.content;
 
+        this._elements_classes__define();
+        this._dom_style__create();
+    }
+
+    static _dom_style__create() {
         if (this.css) {
             let style = document.createElement('style');
             style.textContent = this.css;
@@ -65,6 +70,50 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
             link.href = this.css_url === true ? new URL(`${this.name}.css`, this.url) : this.css_url;
             link.rel = 'stylesheet';
             this._dom.prepend(link);
+        }
+    }
+
+    static _elements__get(dom) {
+        let elements = {};
+
+        for (let [key, value] of Object.entries(this._elements)) {
+            if (value instanceof Array) {
+                let elements_sub = [];
+                let selectors = value;
+
+                for (let selector of selectors) {
+                    elements_sub.push(...dom.querySelectorAll(selector));
+                }
+
+                elements[key] = elements_sub;
+            }
+            else {
+                let selector = value;
+
+                if (!selector) {
+                    selector = `.${key}`;
+                }
+                else if (selector.length == 1) {
+                    selector = `${selector}${key}`;
+                }
+
+                elements[key] = dom.querySelector(selector);
+            }
+        }
+
+        return elements;
+    }
+
+    static _elements_classes__define() {
+        let elements = this._elements__get(this._dom);
+
+        for (let [key, value] of Object.entries(this.elements_classes)) {
+            let element = elements[key];
+            let cssClasses = value.split?.(/\s+/) || value;
+
+            for (let cssClass of cssClasses) {
+                element.classList.add(cssClass);
+            }
         }
     }
 
@@ -398,7 +447,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
             this._shadow.append(this.constructor._dom.cloneNode(true));
 
             this._building = true;
-            this._elements__define();
+            this._elements = this.constructor._elements__get(this._shadow);
             this._slots__define();
 
             await Promise.all([
@@ -416,44 +465,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     async _elements__await() {
         let promises = Object.values(this._elements).map((item) => item._built);
         await Promise.all(promises);
-    }
-
-    _elements__define() {
-        this._elements = {};
-
-        for (let [key, value] of Object.entries(this.constructor._elements)) {
-            if (value instanceof Array) {
-                let elements = [];
-                let selectors = value;
-
-                for (let selector of selectors) {
-                    elements.push(...this._shadow.querySelectorAll(selector));
-                }
-
-                this._elements[key] = elements;
-            }
-            else {
-                let selector = value;
-
-                if (!selector) {
-                    selector = `.${key}`;
-                }
-                else if (selector.length == 1) {
-                    selector = `${selector}${key}`;
-                }
-
-                this._elements[key] = this._shadow.querySelector(selector);
-            }
-        }
-
-        for (let [key, value] of Object.entries(this.constructor.elements_classes)) {
-            let element = this._elements[key];
-            let cssClasses = value.split?.(/\s+/) || value;
-
-            for (let cssClass of cssClasses) {
-                element.classList.add(cssClass);
-            }
-        }
     }
 
     _init() {}
