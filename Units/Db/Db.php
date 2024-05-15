@@ -7,15 +7,15 @@ class Db extends Pdo {
     public $sql_dir = '';
 
 
-    static public function sql_params__create($map) {
-        $params = [];
+    // static public function sql_parameters__create($map) {
+    //     $parameters = [];
 
-        foreach ($map as $map_key => $map_value) {
-            $params[":$map_key"] = $map_value;
-        }
+    //     foreach ($map as $map_key => $map_value) {
+    //         $parameters[":$map_key"] = $map_value;
+    //     }
 
-        return $params;
-    }
+    //     return $parameters;
+    // }
 
 
     public function _sql__get($sql_name) {
@@ -60,5 +60,15 @@ class Db extends Pdo {
 
     public function prepare_sql($sql_name) {
         return $this->prepare($this->_sql__get($sql_name));
+    }
+
+    public function sql_parameters__create($map) {
+        $parameters = [];
+
+        foreach ($map as $map_key => $map_value) {
+            $parameters[":$map_key"] = $map_value;
+        }
+
+        return $parameters;
     }
 }
