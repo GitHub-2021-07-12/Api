@@ -6,7 +6,7 @@
 
 
     .item {
-        display: block !important;
+        display: block;
         grid-area: 1 / 1 / -1 / -1 !important;
         position: relative;
 

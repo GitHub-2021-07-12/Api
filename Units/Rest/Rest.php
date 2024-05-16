@@ -50,8 +50,8 @@ class Rest {
                 throw new Error('Method');
             }
 
-            $data = $this->object->{$this->_method_name}(...$this->_method_args);
-            $result = ['data' => $data];
+            $result = $this->object->{$this->_method_name}(...$this->_method_args);
+            $result = ['result' => $result];
         }
         catch (Error $error) {
             $result = [

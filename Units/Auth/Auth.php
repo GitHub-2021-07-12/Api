@@ -12,9 +12,9 @@ abstract class Auth {
 
 
     public $db = null;
-    public $sql__id__define = 'id__define';
-    public $sql__logIn = 'logIn';
-    public $sql__logOut = 'logOut';
+    // public $sql__id__define = 'id__define';
+    // public $sql__logIn = 'logIn';
+    // public $sql__logOut = 'logOut';
     public $sql__token__add = 'token__add';
     public $sql__token__get = 'token__get';
     public $sql__user__add = 'user__add';

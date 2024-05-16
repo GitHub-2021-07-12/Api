@@ -15,6 +15,10 @@ export class Edit extends Component {
         button_mask: false,
         disabled: false,
         dragAndDrop: false,
+        length_max: {
+            default: Infinity,
+            range: [0, Infinity],
+        },
         mask_char: '●',
         masked: false,
         placeholder: '',
@@ -105,6 +109,13 @@ export class Edit extends Component {
     }
     set dragAndDrop(dragAndDrop) {
         this._attribute__set('dragAndDrop', dragAndDrop);
+    }
+
+    get length_max() {
+        return this._attributes.length_max;
+    }
+    set length_max(length_max) {
+        this._attribute__set('length_max', length_max);
     }
 
     get mask_char() {
@@ -299,11 +310,14 @@ export class Edit extends Component {
             else if (inputType == 'deleteContentForward') {
                 chars_right.shift();
             }
+            else if (this._value.length >= this.length_max) {
+                data = '';
+            }
         }
 
         chars_left.push(...this._string_chars__get(data));
         this._chars = [...chars_left, ...chars_right];
-        this._value = this._chars.join('');
+        this._value = this._chars.join('').slice(0, this.length_max);
 
         if (this.masked) {
             this._elements.input.value = this._value_masked__get();
