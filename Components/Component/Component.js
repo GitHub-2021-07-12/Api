@@ -33,7 +33,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
 
     static async _components__await() {
-        let promises = this._components.map((item) => item._defined);
+        let promises = this._components.map((item) => item?._defined);
         await Promise.all(promises);
     }
 
@@ -463,7 +463,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     }
 
     async _elements__await() {
-        let promises = Object.values(this._elements).map((item) => item._built);
+        let promises = Object.values(this._elements).map((item) => item?._built);
         await Promise.all(promises);
     }
 

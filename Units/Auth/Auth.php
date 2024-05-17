@@ -6,17 +6,14 @@
 require_once __dir__ . '/../Db/Db.php';
 
 
-abstract class Auth {
-    // public $_id = '';
-    // public $_token = '';
+class Auth {
+    public $_id = '';
 
 
     public $db = null;
-    // public $sql__id__define = 'id__define';
-    // public $sql__logIn = 'logIn';
-    // public $sql__logOut = 'logOut';
-    public $sql__token__add = 'token__add';
-    public $sql__token__get = 'token__get';
+    public $sql__authRecord__add = 'authRecord__add';
+    public $sql__authRecord__get = 'authRecord__get';
+    public $sql__authRecord__remove = 'authRecord__remove';
     public $sql__user__add = 'user__add';
     public $sql__user__get = 'user__get';
     public $token_length = 32;
@@ -27,46 +24,45 @@ abstract class Auth {
     }
 
 
-    public function id__define($token) {
-
-    }
-
     public function logIn($name, $password) {
-        $db_statement = $this->db->prepare_sql($this->sql__user__get);
-        $db_statement->execute([':name' => $name]);
-        $user = $db_statement->fetch();
+        $user = $this->db->fetch($this->sql__user__get, ['name' => $name])[0];
 
         if (!$user || !password_verify($password, $user['password_hash'])) return false;
 
-        $db_statement = $this->db->prepare_sql($this->sql__token__get);
-        $db_statement->execute([':name' => $name]);
-        $token = $db_statement->fetch();
+        $authRecord = $this->db->fetch($this->sql__authRecord__get, ['name' => $name])[0];
+        $token = $authRecord['token'];
 
         if (!$token) {
             $token = $this->_token__create();
-            $db_statement = $this->db->prepare_sql($this->sql__token__add);
-            $db_statement->execute([
-                ':token' => $token,
-                ':user_rowId' => $user['rowId'],
-            ]);
+            $data = [
+                'token' => $token,
+                'user_rowId' => $user['rowId'],
+            ];
+            $this->db->execute($this->sql__authRecord__add, $data);
         }
 
         return $token;
     }
 
-    public function logOut($token) {
+    public function logOut($token, $global = false) {
+        if ($global) {
+            $this->db->execute($this->sql__authRecord__remove, ['token' => $token]);
+        }
 
+        return true;
     }
 
     public function register($name, $password, $data = []) {
-        $db_statement = $this->db->prepare_sql($this->sql__user__add);
         $data['name'] = $name;
         $data['password_hash'] = password_hash($password, null);
-        $sql_params = $this->db->sql_parameters__create($data);
-        $db_statement->execute($sql_params);
+        $statement = $this->db->execute($this->sql__user__add, $data);
 
-        if (!$db_statement->rowCount()) return false;
+        if (!$statement->rowCount()) return false;
 
         return $this->logIn($name, $password);
+    }
+
+    public function verify($token) {
+
     }
 }

@@ -2,6 +2,7 @@
 
 
 export class Rest {
+    data__get = () => null;
     url = '';
 
 
@@ -9,21 +10,29 @@ export class Rest {
         let result = null;
 
         try {
+            let request_data = {args, method};
+
+            let data = this.data__get();
+
+            if (data) {
+                request_data.data = data;
+            }
+
             let fetch_opts = {
-                body: JSON.stringify({args, method}),
+                body: JSON.stringify(request_data),
                 method: 'post',
             };
             let response = await fetch(this.url, fetch_opts);
             result = await response.json();
         }
         catch (error) {
-            result = {error: true};
+            result = {error};
         }
 
         return result;
     }
 
-    constructor(url) {
+    constructor(url = '') {
         this.url = url;
     }
 }

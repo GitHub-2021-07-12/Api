@@ -7,8 +7,9 @@ require_once __dir__ . '/../Json/Json.php';
 
 
 class Rest {
-    public $_method_args = [];
-    public $_method_name = '';
+    public $_args = [];
+    public $_data = null;
+    public $_method = '';
     public $_timestamp = null;
 
 
@@ -19,17 +20,18 @@ class Rest {
         $request_method = $_SERVER['REQUEST_METHOD'];
 
         if ($request_method == 'GET') {
-            $this->_method_args = $_GET['args'];
-            $this->_method_name = $_GET['method'];
+            $this->_args = $_GET['args'];
+            $this->_method = $_GET['method'];
         }
         else if ($request_method == 'POST') {
             $request_body = file_get_contents('php://input');
             $request_data = Json::parse($request_body);
-            $this->_method_args = $request_data['args'];
-            $this->_method_name = $request_data['method'];
+            $this->_args = $request_data['args'];
+            $this->_data = $request_data['data'];
+            $this->_method = $request_data['method'];
         }
 
-        $this->_method_args ??= [];
+        $this->_args ??= [];
     }
 
 
@@ -44,25 +46,23 @@ class Rest {
         try {
             $this->_request__parse();
 
-            $reflectionMethod = new ReflectionMethod($this->object, $this->_method_name);
-
-            if (!$reflectionMethod->isFinal()) {
+            if (str_starts_with($this->_method, '_')) {
                 throw new Error('Method');
             }
 
-            $result = $this->object->{$this->_method_name}(...$this->_method_args);
+            $result = $this->object->{$this->_method}(...$this->_args);
             $result = ['result' => $result];
         }
         catch (Error $error) {
             $result = [
                 'error' => $error->getMessage(),
-                'trace' => $error->getTraceAsString(),
+                'trace' => $error->getTrace(),
             ];
         }
         catch (Exception $exception) {
             $result = [
                 'exception' => $exception->getMessage(),
-                'trace' => $exception->getTraceAsString(),
+                'trace' => $exception->getTrace(),
             ];
         }
 

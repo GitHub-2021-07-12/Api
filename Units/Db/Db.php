@@ -1,29 +1,39 @@
 <?php
 
+// 17.05.2024
+
+
 class Db extends Pdo {
-    public $_sql_cache = [];
+    public $_statements = [];
+    public $_statements_prepared = [];
 
 
-    public $sql_dir = '';
+    public $statements_dir = '';
 
 
-    // static public function sql_parameters__create($map) {
-    //     $parameters = [];
+    public function _parameters__proc($parameters) {
+        $parameters_processed = [];
 
-    //     foreach ($map as $map_key => $map_value) {
-    //         $parameters[":$map_key"] = $map_value;
-    //     }
-
-    //     return $parameters;
-    // }
-
-
-    public function _sql__get($sql_name) {
-        if (!$this->_sql_cache[$sql_name]) {
-            $this->_sql_cache[$sql_name] = file_get_contents($this->sql_dir . "/$sql_name.sql");
+        foreach ($parameters as $key => $value) {
+            $parameters_processed[":$key"] = $value;
         }
 
-        return $this->_sql_cache[$sql_name];
+        return $parameters_processed;
+    }
+
+    public function _statement__get($key) {
+        $this->statement__add($key);
+
+        return $this->_statements[$key];
+    }
+
+    public function _statement_prepared__get($key) {
+        if (!$this->_statements_prepared[$key]) {
+            $statement = $this->_statement__get($key);
+            $this->_statements_prepared[$key] = $this->prepare($statement);
+        }
+
+        return $this->_statements_prepared[$key];
     }
 
 
@@ -36,39 +46,28 @@ class Db extends Pdo {
         $this->setAttribute(static::ATTR_STRINGIFY_FETCHES, false);
     }
 
-    public function exec_sql($sql_name) {
-        return $this->exec($this->_sql__get($sql_name));
+    public function execute($key, $parameters = []) {
+        $parameters = $this->_parameters__proc($parameters);
+        $statement_prepared = $this->_statement_prepared__get($key);
+        $statement_prepared->execute($parameters);
+
+        return $statement_prepared;
     }
 
-    public function mySql_data__load($table_name, $fields_names, $data_file_path, $fields_delimiter = ';', $lines_delimiter = "\r\n") {
-        $data_file_path = str_replace('\\', '/', realpath($data_file_path));
-        $fields_names = implode(',', $fields_names);
-        $query = $this->prepare("
-            load data local infile '$data_file_path'
-            ignore into table `$table_name`
-            fields terminated by '$fields_delimiter'
-            lines terminated by '$lines_delimiter'
-            ($fields_names)
-        ");
-
-        return $query->execute();
+    public function execute_raw($key) {
+        return $this->exec($this->_statement__get($key));
     }
 
-    public function query_sql($sql_name) {
-        return $this->query($this->_sql__get($sql_name));
+    public function fetch($key, $parameters = []) {
+        $statement_prepared = $this->execute($key, $parameters);
+        $data = $statement_prepared->fetchAll();
+
+        return $data;
     }
 
-    public function prepare_sql($sql_name) {
-        return $this->prepare($this->_sql__get($sql_name));
-    }
+    public function statement__add($key, $statement = '') {
+        if ($this->_statements[$key]) return;
 
-    public function sql_parameters__create($map) {
-        $parameters = [];
-
-        foreach ($map as $map_key => $map_value) {
-            $parameters[":$map_key"] = $map_value;
-        }
-
-        return $parameters;
+        $this->_statements[$key] = $statement ?: file_get_contents($this->statements_dir . "/$key.sql");
     }
 }
