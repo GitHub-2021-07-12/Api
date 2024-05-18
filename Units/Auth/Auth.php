@@ -16,6 +16,7 @@ class Auth {
     public $sql__authRecord__remove = 'authRecord__remove';
     public $sql__user__add = 'user__add';
     public $sql__user__get = 'user__get';
+    public $sql__user__get_by_token = 'user__get_by_token';
     public $token_length = 32;
 
 
@@ -63,6 +64,9 @@ class Auth {
     }
 
     public function verify($token) {
+        $user = $this->db->fetch($this->sql__user__get_by_token, ['token' => $token])[0];
+        $this->_id = $user['rowId'] ?: '';
 
+        return !!$this->_id;
     }
 }

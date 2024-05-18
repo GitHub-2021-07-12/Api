@@ -58,6 +58,7 @@ export class Auth {
         if (!this._token) return false;
 
         let {result} = await this._rest.call('verify', this._token);
+        // let {result} = await this._rest.call('verify');
 
         return !!result;
     }

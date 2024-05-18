@@ -8,12 +8,12 @@ require_once __dir__ . '/../Json/Json.php';
 
 class Rest {
     public $_args = [];
-    public $_data = null;
+    public $_data = [];
     public $_method = '';
-    public $_timestamp = null;
+    public $_timeStamp = null;
 
 
-    public $object = null;
+    public $target = null;
 
 
     public function _request__parse() {
@@ -32,25 +32,26 @@ class Rest {
         }
 
         $this->_args ??= [];
+        $this->_data ??= [];
     }
 
 
     public function __construct() {
-        $this->_timestamp = microTime(true);
-        $this->object = $this;
+        $this->_timeStamp = microTime(true);
+        $this->target = $this;
+
+        $this->_request__parse();
     }
 
     public function run() {
         $result = null;
 
         try {
-            $this->_request__parse();
-
             if (str_starts_with($this->_method, '_')) {
                 throw new Error('Method');
             }
 
-            $result = $this->object->{$this->_method}(...$this->_args);
+            $result = $this->target->{$this->_method}(...$this->_args);
             $result = ['result' => $result];
         }
         catch (Error $error) {
