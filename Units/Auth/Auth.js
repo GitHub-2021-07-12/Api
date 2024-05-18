@@ -1,5 +1,6 @@
 // 15.05.2024
 
+
 import {Rest} from '../Rest/Rest.js';
 
 
@@ -12,6 +13,14 @@ export class Auth {
     password = '';
     registration_data = {};
 
+
+    _rest_data__create() {
+        return {
+            name: this.name,
+            password: this.password,
+            token: this._token || undefined,
+        };
+    }
 
     _token__remove() {
         localStorage.removeItem('Auth.token');
@@ -26,15 +35,18 @@ export class Auth {
     }
 
 
-    constructor(url) {
-        this._rest.data__get = () => ({token: this._token});
+    constructor(url = '') {
+        // this._rest.data__create = () => ({token: this._token});
+        this._rest.data__create = this._rest_data__create.bind(this);
+        // this._rest.fields__create = () => ({token: this._token});
         this._rest.url = url;
 
         this._token__restore();
     }
 
     async logIn() {
-        let {result} = await this._rest.call('logIn', this.name, this.password);
+        // let {result} = await this._rest.call('logIn', this.name, this.password);
+        let {result} = await this._rest.call('logIn');
 
         this._token = result || '';
         this._token__save();
@@ -48,7 +60,8 @@ export class Auth {
     }
 
     async register() {
-        let {result} = await this._rest.call('register', this.name, this.password, this.registration_data);
+        // let {result} = await this._rest.call('register', this.name, this.password, this.registration_data);
+        let {result} = await this._rest.call('register', this.registration_data);
 
         this._token = result || '';
         this._token__save();
@@ -57,8 +70,8 @@ export class Auth {
     async verify() {
         if (!this._token) return false;
 
-        let {result} = await this._rest.call('verify', this._token);
-        // let {result} = await this._rest.call('verify');
+        // let {result} = await this._rest.call('verify', this._token);
+        let {result} = await this._rest.call('verify');
 
         return !!result;
     }
