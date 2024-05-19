@@ -11,17 +11,16 @@ class Auth {
 
 
     public $db = null;
+    public $name = '';
+    public $password = '';
     public $sql__authRecord__add = 'authRecord__add';
     public $sql__authRecord__get = 'authRecord__get';
     public $sql__authRecord__remove = 'authRecord__remove';
     public $sql__user__add = 'user__add';
     public $sql__user__get = 'user__get';
     public $sql__user__get_by_token = 'user__get_by_token';
-    public $token_length = 32;
-
-    public $name = '';
-    public $password = '';
     public $token = '';
+    public $token_length = 32;
 
 
     public function _token__create() {
@@ -29,15 +28,11 @@ class Auth {
     }
 
 
-    // public function logIn($name, $password) {
     public function logIn() {
-        // $user = $this->db->fetch($this->sql__user__get, ['name' => $name])[0];
         $user = $this->db->fetch($this->sql__user__get, ['name' => $this->name])[0];
 
-        // if (!$user || !password_verify($password, $user['password_hash'])) return false;
         if (!$user || !password_verify($this->password, $user['password_hash'])) return false;
 
-        // $authRecord = $this->db->fetch($this->sql__authRecord__get, ['name' => $name])[0];
         $authRecord = $this->db->fetch($this->sql__authRecord__get, ['name' => $this->name])[0];
         $token = $authRecord['token'];
 
@@ -53,33 +48,25 @@ class Auth {
         return $token;
     }
 
-    // public function logOut($token, $global = false) {
     public function logOut($global = false) {
         if ($global) {
-            // $this->db->execute($this->sql__authRecord__remove, ['token' => $token]);
             $this->db->execute($this->sql__authRecord__remove, ['token' => $this->token]);
         }
 
         return true;
     }
 
-    // public function register($name, $password, $data = []) {
     public function register($data = []) {
-        // $data['name'] = $name;
-        // $data['password_hash'] = password_hash($password, null);
         $data['name'] = $this->name;
         $data['password_hash'] = password_hash($this->password, null);
         $statement = $this->db->execute($this->sql__user__add, $data);
 
         if (!$statement->rowCount()) return false;
 
-        // return $this->logIn($name, $password);
         return $this->logIn();
     }
 
-    // public function verify($token) {
     public function verify() {
-        // $user = $this->db->fetch($this->sql__user__get_by_token, ['token' => $token])[0];
         $user = $this->db->fetch($this->sql__user__get_by_token, ['token' => $this->token])[0];
         $this->_id = $user['rowId'] ?: '';
 

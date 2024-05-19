@@ -16,8 +16,8 @@ export class Auth {
 
     _rest_data__create() {
         return {
-            name: this.name,
-            password: this.password,
+            name: this.name || undefined,
+            password: this.password || undefined,
             token: this._token || undefined,
         };
     }
@@ -26,26 +26,19 @@ export class Auth {
         localStorage.removeItem('Auth.token');
     }
 
-    _token__restore() {
-        this._token = localStorage.getItem('Auth.token');
-    }
-
     _token__save() {
         localStorage.setItem('Auth.token', this._token);
     }
 
 
     constructor(url = '') {
-        // this._rest.data__create = () => ({token: this._token});
         this._rest.data__create = this._rest_data__create.bind(this);
-        // this._rest.fields__create = () => ({token: this._token});
         this._rest.url = url;
 
-        this._token__restore();
+        this.token__restore();
     }
 
     async logIn() {
-        // let {result} = await this._rest.call('logIn', this.name, this.password);
         let {result} = await this._rest.call('logIn');
 
         this._token = result || '';
@@ -60,17 +53,19 @@ export class Auth {
     }
 
     async register() {
-        // let {result} = await this._rest.call('register', this.name, this.password, this.registration_data);
         let {result} = await this._rest.call('register', this.registration_data);
 
         this._token = result || '';
         this._token__save();
     }
 
+    token__restore() {
+        this._token = localStorage.getItem('Auth.token') || '';
+    }
+
     async verify() {
         if (!this._token) return false;
 
-        // let {result} = await this._rest.call('verify', this._token);
         let {result} = await this._rest.call('verify');
 
         return !!result;

@@ -68,6 +68,6 @@ class Db extends Pdo {
     public function statement__add($key, $statement = '') {
         if ($this->_statements[$key]) return;
 
-        $this->_statements[$key] = $statement ?: file_get_contents($this->statements_dir . "/$key.sql");
+        $this->_statements[$key] = $statement ?: file_get_contents("$this->statements_dir/$key.sql");
     }
 }

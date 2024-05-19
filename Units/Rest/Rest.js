@@ -2,8 +2,6 @@
 
 
 export class Rest {
-    // data__create = () => null;
-    // fields__create = () => null;
     url = '';
 
 
@@ -15,12 +13,6 @@ export class Rest {
         if (data) {
             request_data.data = data;
         }
-
-        // let fields = this.fields__create();
-
-        // if (fields) {
-        //     request_data.fields = fields;
-        // }
 
         request_data.method = method;
 

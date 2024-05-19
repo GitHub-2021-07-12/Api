@@ -11,20 +11,13 @@ class Rest {
     public $_fields = [];
     public $_method = '';
     public $_method_args = [];
-    public $_target = null;
-    // public $_timeStamp = 0;
+    public $_timeStamp = 0;
 
 
-    // public $target = null;
+    public $timeLimit = 60;
 
 
-    // public function _fields__apply() {
-    //     foreach ($this->_fields as $key => $value) {
-    //         if (str_starts_with($key, '_') || !property_exists($this->target, $key)) continue;
-
-    //         $this->target->{$key} = $value;
-    //     }
-    // }
+    public function _init() {}
 
     public function _request__parse() {
         $request_method = $_SERVER['REQUEST_METHOD'];
@@ -71,45 +64,17 @@ class Rest {
         echo Json::stringify($result);
     }
 
-    public function _target__create() {}
+    public function _timeLimit__check() {
+        return microTime(true) - $this->_timeStamp <= $this->timeLimit;
+    }
 
 
     public function __construct() {
-        // $this->_timeStamp = microTime(true);
-        // $this->target = $this;
+        set_time_limit(0);
+
+        $this->_timeStamp = microTime(true);
         $this->_request__parse();
-        $this->_target__create();
+        $this->_init();
         $this->_run();
-    }
-
-    public function run() {
-        $result = null;
-
-        try {
-            // $this->_request__parse();
-
-            if (!$this->_method || str_starts_with($this->_method, '_')) {
-                throw new Error('Method');
-            }
-
-            // $this->_fields__apply();
-            // $result = $this->target->{$this->_method}(...$this->_method_args);
-            $result = $this->{$this->_method}(...$this->_method_args);
-            $result = ['result' => $result];
-        }
-        catch (Error $error) {
-            $result = [
-                'error' => $error->getMessage(),
-                'trace' => $error->getTrace(),
-            ];
-        }
-        catch (Exception $exception) {
-            $result = [
-                'exception' => $exception->getMessage(),
-                'trace' => $exception->getTrace(),
-            ];
-        }
-
-        echo Json::stringify($result);
     }
 }
