@@ -7,14 +7,15 @@ require_once __dir__ . '/../Json/Json.php';
 
 
 class Rest {
+    static public $timeLimit = 60;
+    static public $trace = false;
+
+
     public $_data = [];
     public $_fields = [];
     public $_method = '';
     public $_method_args = [];
     public $_timeStamp = 0;
-
-
-    public $timeLimit = 60;
 
 
     public function _init() {}
@@ -41,31 +42,37 @@ class Rest {
         $result = null;
 
         try {
+            $this->_request__parse();
+
             if (!$this->_method || str_starts_with($this->_method, '_')) {
                 throw new Error('Method');
             }
+
+            $this->_init();
 
             $result = $this->{$this->_method}(...$this->_method_args);
             $result = ['result' => $result];
         }
         catch (Error $error) {
-            $result = [
-                'error' => $error->getMessage(),
-                'trace' => $error->getTrace(),
-            ];
+            $result = ['error' => $error->getMessage()];
+
+            if (static::$trace) {
+                $result['trace'] = $error->getTrace();
+            }
         }
         catch (Exception $exception) {
-            $result = [
-                'exception' => $exception->getMessage(),
-                'trace' => $exception->getTrace(),
-            ];
+            $result = ['exception' => $exception->getMessage()];
+
+            if (static::$trace) {
+                $result['trace'] = $exception->getTrace();
+            }
         }
 
         echo Json::stringify($result);
     }
 
     public function _timeLimit__check() {
-        return microTime(true) - $this->_timeStamp <= $this->timeLimit;
+        return microTime(true) - $this->_timeStamp <= static::$timeLimit;
     }
 
 
@@ -73,8 +80,6 @@ class Rest {
         set_time_limit(0);
 
         $this->_timeStamp = microTime(true);
-        $this->_request__parse();
-        $this->_init();
         $this->_run();
     }
 }
