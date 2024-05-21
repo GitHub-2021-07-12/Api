@@ -441,12 +441,12 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
         this._attributes_observing = true;
         this._attributes__init();
+        this._building = true;
 
         if (this.constructor._dom) {
             this._shadow = this.attachShadow(this.constructor.shadow_opts);
             this._shadow.append(this.constructor._dom.cloneNode(true));
 
-            this._building = true;
             this._elements = this.constructor._elements__get(this._shadow);
             this._slots__define();
 
@@ -454,11 +454,12 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
                 this._elements__await(),
                 this._resources__await(),
             ]);
-
-            this._building = false;
         }
 
         await this._init();
+        this._eventListeners__define();
+
+        this._building = false;
         built_resolve();
     }
 
@@ -466,6 +467,8 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         let promises = Object.values(this._elements).map((item) => item?._built);
         await Promise.all(promises);
     }
+
+    _eventListeners__define() {}
 
     _init() {}
 

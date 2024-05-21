@@ -14,7 +14,7 @@ class Db extends Pdo {
     public function _parameters__proc($parameters) {
         $parameters_processed = [];
 
-        foreach ($parameters as $key => $value) {
+        forEach ($parameters as $key => $value) {
             $parameters_processed[":$key"] = $value;
         }
 

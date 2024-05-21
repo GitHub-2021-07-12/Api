@@ -41,7 +41,7 @@ class Http {
 
         $response_headers = [];
 
-        foreach ($response_headers_strings as $response_header_string) {
+        forEach ($response_headers_strings as $response_header_string) {
             $response_header_string_parts = explode(': ', $response_header_string, 2);
             $response_headers[mb_strToLower($response_header_string_parts[0])] = $response_header_string_parts[1];
         }

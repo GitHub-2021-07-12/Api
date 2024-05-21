@@ -7,6 +7,7 @@ require_once __dir__ . '/../Json/Json.php';
 
 
 class Rest {
+    static public $gzip = 0;
     static public $timeLimit = 60;
     static public $trace = false;
 
@@ -68,7 +69,25 @@ class Rest {
             }
         }
 
-        echo Json::stringify($result);
+        // echo Json::stringify($result);
+
+        $result = Json::stringify($result);
+
+        if (static::$gzip) {
+            $result = gzEncode($result, static::$gzip);
+            header('Content-Encoding: gzip');
+        }
+
+        echo $result;
+
+        // else {
+
+        // }
+
+        // $result = gzEncode($result);
+
+        // header('Content-Encoding: gzip');
+        // echo $result;
     }
 
     public function _timeLimit__check() {
