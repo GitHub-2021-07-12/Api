@@ -30,12 +30,6 @@ export class TextArea extends Component {
     static html_url = true;
     static url = import.meta.url;
 
-    static shadow_opts = {
-        ...super.shadow_opts,
-
-        delegatesFocus: true,
-    };
-
 
     static {
         this.define();
@@ -95,16 +89,8 @@ export class TextArea extends Component {
     }
 
 
-    _height__define() {
-        this.constructor.height_outer__set(this._elements.input, 1);
-        this.height_inner__set(this._elements.input.scrollHeight);
-        this.constructor.height_outer__set(this._elements.input);
-    }
-
-    _init() {
-        this.props__sync('disabled', 'placeholder', 'spellCheck');
-        this.refresh();
-
+    _eventListeners__define() {
+        this.addEventListener('touchstart', this._on_touchStart);
         this.constructor.eventListeners__add(
             this._elements.input,
             {
@@ -118,6 +104,17 @@ export class TextArea extends Component {
                 pointerdown: this._input__on_pointerDown.bind(this),
             },
         );
+    }
+
+    _height__define() {
+        this.constructor.height_outer__set(this._elements.input, 1);
+        this.height_outer__set(this._elements.input.scrollHeight);
+        this.constructor.height_outer__set(this._elements.input);
+    }
+
+    _init() {
+        this.props__sync('disabled', 'placeholder', 'spellCheck');
+        this.refresh();
     }
 
     _input__on_beforeInput() {
@@ -163,10 +160,14 @@ export class TextArea extends Component {
         this.event__dispatch('resize');
     }
 
-    _input__on_pointerDown() {
-        if (this.dragAndDrop) return;
+    _input__on_pointerDown(event) {
+        if (this.dragAndDrop || !event.ctrlKey) return;
 
         this._elements.input.setSelectionRange(0, 0);
+    }
+
+    _on_touchStart(event) {
+        event.stopPropagation();
     }
 
 

@@ -28,9 +28,9 @@ export class Edit extends Component {
     };
 
     static _elements = {
-        input: '',
         button_clear: '',
         button_mask: '',
+        input: '',
     };
 
 
@@ -42,12 +42,6 @@ export class Edit extends Component {
         button_clear: new URL(`${this.name}.svg#cross`, this.url),
         button_mask__off: new URL(`${this.name}.svg#eye_open`, this.url),
         button_mask__on: new URL(`${this.name}.svg#eye_closed`, this.url),
-    };
-
-    static shadow_opts = {
-        ...super.shadow_opts,
-
-        delegatesFocus: true,
     };
 
 
@@ -138,7 +132,7 @@ export class Edit extends Component {
     }
     set masked(masked) {
         this._attribute__set('masked', masked);
-        this._elements.input.value = this.masked ? this._value_masked__get() : this._value;
+        this.value = this.value;
     }
 
     get placeholder() {
@@ -198,9 +192,8 @@ export class Edit extends Component {
         this.masked = !this.masked;
     }
 
-    _init() {
-        this.props__sync('disabled', 'mask_char', 'placeholder', 'regExp', 'template_char');
-
+    _eventListeners__define() {
+        this.addEventListener('touchstart', this._on_touchStart);
         this._elements.button_clear.addEventListener('pointerdown', this._button_clear__on_pointerDown.bind(this));
         this._elements.button_mask.addEventListener('pointerdown', this._button_mask__on_pointerDown.bind(this));
         this.constructor.eventListeners__add(
@@ -218,6 +211,10 @@ export class Edit extends Component {
                 pointerdown: this._input__on_pointerDown.bind(this),
             },
         );
+    }
+
+    _init() {
+        this.props__sync('disabled', 'mask_char', 'placeholder', 'regExp', 'template_char');
     }
 
     _input__on_beforeInput(event) {
@@ -287,10 +284,14 @@ export class Edit extends Component {
         this._value__change(this._event_data, event.inputType);
     }
 
-    _input__on_pointerDown() {
-        if (this.dragAndDrop) return;
+    _input__on_pointerDown(event) {
+        if (this.dragAndDrop || !event.ctrlKey) return;
 
         this._elements.input.setSelectionRange(0, 0);
+    }
+
+    _on_touchStart(event) {
+        event.stopPropagation();
     }
 
     _string_chars__get(string, position_begin = 0, position_end = undefined) {
@@ -339,6 +340,14 @@ export class Edit extends Component {
         return Array(this._chars.length + 1).join(this.mask_char);
     }
 
+
+    blur() {
+        this._elements.input.blur();
+    }
+
+    focus() {
+        this._elements.input.focus();
+    }
 
     validate() {
         let valid = this._regExp.test(this.value);

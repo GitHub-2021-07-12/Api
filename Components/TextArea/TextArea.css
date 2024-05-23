@@ -1,6 +1,7 @@
 @layer init {
     :host {
         --TextArea__gap: 0px;
+        --TextArea__padding: var(--TextArea__gap);
         --TextArea__placeholder_color: currentColor;
         --TextArea__placeholder_opacity: 0.4;
         --TextArea__puck__length_min: 20%;
@@ -13,7 +14,7 @@
         display: block;
         font-family: 'Arial';
         max-height: 120px;
-        padding: 4px;
+        padding: var(--TextArea__padding) !important;
         width: 400px;
     }
     :host([_focused]) {
@@ -39,11 +40,10 @@
         border: none !important;
         color: inherit;
         font: inherit;
-        /* line-height: 1.5; */
-        margin: 0 !important;
-        outline: none !important;
         height: 100%;
-        padding: 0 !important;
+        margin: calc(-1 * var(--TextArea__padding)) !important;
+        outline: none !important;
+        padding: var(--TextArea__padding) !important;
         resize: none !important;
 
         &::placeholder {
