@@ -39,7 +39,7 @@
         border: none !important;
         color: inherit;
         font: inherit;
-        line-height: 1.5;
+        /* line-height: 1.5; */
         margin: 0 !important;
         outline: none !important;
         height: 100%;
