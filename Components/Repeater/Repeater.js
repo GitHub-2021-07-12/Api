@@ -210,7 +210,7 @@ export class Repeater extends Component {
         }
         else {
             let item = this._items.get(key);
-            item.Repeater__manager.data__apply();
+            item.Repeater__manager?.data__apply();
         }
     }
 
@@ -228,8 +228,11 @@ export class Repeater extends Component {
         await this._items__await(items);
 
         for (let item of items) {
-            item.Repeater__manager.init();
+            item.Repeater__manager?.init();
         }
+
+        // let promises = items.map((item) => item.Repeater__manager?.init());
+        // await Promise.allSettled(promises);
 
         this.event__dispatch('add', {items});
     }
@@ -273,6 +276,9 @@ export class Repeater extends Component {
         for (let item of items) {
             item.Repeater__manager?.init();
         }
+
+        // let promises = items.map((item) => item.Repeater__manager?.init());
+        // await Promise.allSettled(promises);
 
         this.event__dispatch('define', {items});
     }
@@ -331,7 +337,7 @@ export class Repeater extends Component {
 
     _items_indexes__apply() {
         for (let item of this._items.values()) {
-            item.Repeater__manager.index__apply();
+            item.Repeater__manager?.index__apply();
         }
     }
 

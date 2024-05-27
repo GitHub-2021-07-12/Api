@@ -4,6 +4,7 @@
 import {Class} from '../../Units/Class/Class.js';
 import {Common} from '../../Units/Common/Common.js';
 import {EventManager} from '../../Units/EventManager/EventManager.js';
+import {ExternalPromise} from '../../Units/ExternalPromise/ExternalPromise.js';
 
 
 export class Component extends Class.mix(HTMLElement, EventManager) {
@@ -284,6 +285,30 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         return path;
     }
 
+    static async resources__await(elements) {
+        let promises = [];
+
+        for (let element of elements) {
+            let resource_url = element.href || element.src;
+
+            if (!resource_url || resource_url == location.href) continue;
+
+            let promise = new ExternalPromise();
+            promises.push(promise);
+
+            let resource__on_error = () => promise.reject();
+            let resource__on_load = () => {
+                element.removeEventListener('error', resource__on_error);
+                promise.fulfill();
+            };
+
+            element.addEventListener('error', resource__on_error, {once: true});
+            element.addEventListener('load', resource__on_load, {once: true});
+        }
+
+        await Promise.allSettled(promises);
+    }
+
     static top__get(element) {
         if (!element.offsetParent) return 0;
 
@@ -363,7 +388,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     _attributes = null;
     _attributes_observing = false;
-    _built = null;
+    _built = new ExternalPromise();
     _elements = null;
     _slots = null;
     _shadow = null;
@@ -434,10 +459,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     }
 
     async _build() {
-        if (this._built) return;
-
-        let built_resolve = null;
-        this._built = new Promise((resolve) => built_resolve = resolve);
+        if (this._attributes_observing) return;
 
         this._attributes_observing = true;
         this._attributes__init();
@@ -452,7 +474,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
             await Promise.all([
                 this._elements__await(),
-                this._resources__await(),
+                this.constructor.resources__await(this._shadow.querySelectorAll(this.constructor.resource_awaited_selector)),
             ]);
         }
 
@@ -460,39 +482,24 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         this._eventListeners__define();
 
         this._building = false;
-        built_resolve();
+        this._built.fulfill(true);
     }
 
     async _elements__await() {
-        let promises = Object.values(this._elements).map((item) => item?._built);
+        let elements = [];
+
+        for (let component of this.constructor._components) {
+            let component_elements = this._shadow.querySelectorAll(component._tag);
+            elements.push(...component_elements);
+        }
+
+        let promises = elements.map((item) => item?._built);
         await Promise.all(promises);
     }
 
     _eventListeners__define() {}
 
     _init() {}
-
-    async _resources__await() {
-        let promises = [];
-        let resources = this._shadow.querySelectorAll(this.constructor.resource_awaited_selector);
-
-        for (let resource of resources) {
-            if (!resource.href || resource.href == location.href) continue;
-
-            let promise_reject = null;
-            let promise_resolve = null;
-            let promise = new Promise((resolve, reject) => {
-                promise_reject = reject;
-                promise_resolve = resolve;
-            });
-            promises.push(promise);
-
-            resource.addEventListener('error', promise_reject, {once: true});
-            resource.addEventListener('load', promise_resolve, {once: true});
-        }
-
-        await Promise.allSettled(promises);
-    }
 
     _slots__define() {
         let slots = this._shadow.querySelectorAll('slot');

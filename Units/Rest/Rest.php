@@ -69,8 +69,6 @@ class Rest {
             }
         }
 
-        // echo Json::stringify($result);
-
         $result = Json::stringify($result);
 
         if (static::$gzip) {
@@ -79,15 +77,6 @@ class Rest {
         }
 
         echo $result;
-
-        // else {
-
-        // }
-
-        // $result = gzEncode($result);
-
-        // header('Content-Encoding: gzip');
-        // echo $result;
     }
 
     public function _timeLimit__check() {
