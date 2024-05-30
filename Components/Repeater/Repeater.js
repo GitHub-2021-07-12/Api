@@ -157,6 +157,8 @@ export class Repeater extends Component {
                 this._attribute__set('target');
             }
         }
+
+        // this.refresh();
     }
 
 

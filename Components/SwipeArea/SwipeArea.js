@@ -99,14 +99,16 @@ export class SwipeArea extends Component {
     }
 
 
-    _init() {
-        this.props__sync('disabled');
-
+    _eventListeners__define() {
         this.eventListeners__add({
             lostpointercapture: this._on_lostPointerCapture,
             pointerdown: this._on_pointerDown,
         });
         this.addEventListener('pointermove', this._on_pointerMove);
+    }
+
+    _init() {
+        this.props__sync('disabled');
     }
 
     _on_lostPointerCapture(event) {

@@ -8,6 +8,7 @@ require_once __dir__ . '/../Json/Json.php';
 
 class Rest {
     static public $gzip = 0;
+    static public $request_method = 'POST';
     static public $timeLimit = 60;
     static public $trace = false;
 
@@ -22,13 +23,15 @@ class Rest {
     public function _init() {}
 
     public function _request__parse() {
-        $request_method = $_SERVER['REQUEST_METHOD'];
+        if ($_SERVER['REQUEST_METHOD'] != static::$request_method) {
+            throw new Exception('Request_method');
+        }
 
-        if ($request_method == 'GET') {
+        if (static::$request_method == 'GET') {
             $this->_method = $_GET['method'] ?? '';
             $this->_method_args = $_GET['method_args'] ?? [];
         }
-        else if ($request_method == 'POST') {
+        else if (static::$request_method == 'POST') {
             $request_body = file_get_contents('php://input');
             $request_data = Json::parse($request_body);
 
@@ -37,6 +40,10 @@ class Rest {
             $this->_method = $request_data['method'] ?? '';
             $this->_method_args = $request_data['method_args'] ?? [];
         }
+
+        if (!$this->_method || str_starts_with($this->_method, '_')) {
+            throw new Exception('Method');
+        }
     }
 
     public function _run() {
@@ -44,11 +51,6 @@ class Rest {
 
         try {
             $this->_request__parse();
-
-            if (!$this->_method || str_starts_with($this->_method, '_')) {
-                throw new Error('Method');
-            }
-
             $this->_init();
 
             $result = $this->{$this->_method}(...$this->_method_args);

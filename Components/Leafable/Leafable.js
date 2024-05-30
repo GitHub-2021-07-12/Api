@@ -225,6 +225,18 @@ export class Leafable extends SwipeArea {
         }
     }
 
+    _eventListeners__define() {
+        super._eventListeners__define();
+
+        this.eventListeners__add({
+            capture: this._on_capture,
+            flick: this._on_flick,
+            release: this._on_release,
+            swipe: this._on_swipe,
+            swipe_begin: this._on_swipe_begin,
+        });
+    }
+
     _index__proc(index) {
         let f = this.looped ? Common.to_ring : Common.to_range;
 
@@ -235,14 +247,6 @@ export class Leafable extends SwipeArea {
         super._init();
 
         this.props__sync('index');
-
-        this.eventListeners__add({
-            capture: this._on_capture,
-            flick: this._on_flick,
-            release: this._on_release,
-            swipe: this._on_swipe,
-            swipe_begin: this._on_swipe_begin,
-        });
     }
 
     _item_current__set(item_current_index = NaN) {

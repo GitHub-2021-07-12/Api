@@ -209,10 +209,8 @@ export class Flickable extends SwipeArea {
     }
 
 
-    _init() {
-        super._init();
-
-        this.refresh();
+    _eventListeners__define() {
+        super._eventListeners__define();
 
         this.eventListeners__add({
             capture: this._on_capture,
@@ -224,6 +222,12 @@ export class Flickable extends SwipeArea {
         this._elements.scrollBar_x.addEventListener('change', this._scrollBar_x__on_value_change.bind(this));
         this._elements.scrollBar_y.addEventListener('change', this._scrollBar_y__on_value_change.bind(this));
         this._slots.display.addEventListener('scroll', this._on_scroll.bind(this));
+    }
+
+    _init() {
+        super._init();
+
+        this.refresh();
     }
 
     _on_capture(event) {
@@ -344,10 +348,6 @@ export class Flickable extends SwipeArea {
         if (this._scroll_y) {
             this._elements.scrollBar_y.value = this.scroll_y / this._scroll_y_factor;
         }
-    }
-
-    _window__on_resize() {
-        this.refresh();
     }
 
 

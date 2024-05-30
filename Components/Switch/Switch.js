@@ -62,7 +62,7 @@ export class Switch extends Component {
     }
 
 
-    _init() {
+    _eventListeners__define() {
         this.eventListeners__add({
             pointerdown: this._on_pointerDown,
             transitionend: this._on_transitionEnd,

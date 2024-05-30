@@ -143,12 +143,13 @@ export class TrackBar extends Component {
         this._puck_position__define();
     }
 
+    _eventListeners__define() {
+        this._elements.puck.addEventListener('drag', this._puck__on_drag.bind(this));
+    }
 
     _init() {
         this.props__sync('vertical');
         this.refresh();
-
-        this._elements.puck.addEventListener('drag', this._puck__on_drag.bind(this));
     }
 
     _puck__on_drag() {

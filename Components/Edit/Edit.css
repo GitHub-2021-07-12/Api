@@ -2,12 +2,15 @@
     :host {
         --Edit__gap: 4px;
         --Edit__padding: var(--Edit__gap);
+        --Edit__padding_horizontal: var(--Edit__padding);
+        --Edit__padding_vertical: var(--Edit__padding);
         --Edit__placeholder_color: currentColor;
         --Edit__placeholder_opacity: 0.4;
 
         border: 1px solid #888;
         border-radius: 2px;
         display: inline-block;
+        line-height: 1.5;
         overflow: hidden !important;
         padding: 0 !important;
         user-select: none !important;
@@ -22,6 +25,9 @@
     :host([disabled]) {
         background: #eee;
         border-color: #ccc;
+    }
+    :host(:is([button_clear], [button_mask])) {
+        padding-right: var(--Edit__padding_horizontal) !important;
     }
 
 
@@ -80,14 +86,17 @@
         border: none;
         color: inherit;
         font: inherit;
-        line-height: 1.5;
+        /* line-height: 1.5; */
         outline: none;
-        padding: var(--Edit__padding) !important;
-        padding-right: 0 !important;
+        padding: var(--Edit__padding_vertical) var(--Edit__padding_horizontal) !important;
 
         &::placeholder {
             color: var(--Edit__placeholder_color);
             opacity: var(--Edit__placeholder_opacity);
+        }
+
+        :host(:is([button_clear], [button_mask])) & {
+            padding-right: 0 !important;
         }
     }
 
@@ -99,7 +108,6 @@
         grid-auto-columns: auto min-content min-content;
         grid-auto-flow: column;
         height: 100%;
-        padding-right: var(--Edit__padding) !important;
         width: 100%;
     }
 }

@@ -13,6 +13,7 @@
         border: 1px solid #888;
         display: block;
         font-family: 'Arial';
+        line-height: 1.5;
         max-height: 120px;
         padding: var(--TextArea__padding) !important;
         width: 400px;

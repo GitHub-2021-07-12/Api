@@ -173,8 +173,8 @@ export class Draggable extends SwipeArea {
         return true;
     }
 
-    _init() {
-        super._init();
+    _eventListeners__define() {
+        super._eventListeners__define();
 
         this.eventListeners__add({
             capture: this._on_capture,
