@@ -1,9 +1,10 @@
 // 18.03.2021
 
 
-import {Common} from '../../Units/Common/Common.js';
 import {Component} from '../Component/Component.js';
 import {Draggable} from '../Draggable/Draggable.js';
+
+import {Common} from '../../Units/Common/Common.js';
 
 
 export class TrackBar extends Component {

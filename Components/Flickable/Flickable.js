@@ -1,9 +1,10 @@
 // 04.03.2024
 
 
-import {Renderer} from '../../Units/Renderer/Renderer.js';
 import {SwipeArea} from '../SwipeArea/SwipeArea.js';
 import {TrackBar} from '../TrackBar/TrackBar.js';
+
+import {Renderer} from '../../Units/Renderer/Renderer.js';
 import {Vector_2d} from '../../Units/Vector_2d/Vector_2d.js';
 
 

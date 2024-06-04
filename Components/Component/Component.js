@@ -74,39 +74,8 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         }
     }
 
-    static _elements__get(dom) {
-        let elements = {};
-
-        for (let [key, value] of Object.entries(this._elements)) {
-            if (value instanceof Array) {
-                let elements_sub = [];
-                let selectors = value;
-
-                for (let selector of selectors) {
-                    elements_sub.push(...dom.querySelectorAll(selector));
-                }
-
-                elements[key] = elements_sub;
-            }
-            else {
-                let selector = value;
-
-                if (!selector) {
-                    selector = `.${key}`;
-                }
-                else if (selector.length == 1) {
-                    selector = `${selector}${key}`;
-                }
-
-                elements[key] = dom.querySelector(selector);
-            }
-        }
-
-        return elements;
-    }
-
     static _elements_classes__define() {
-        let elements = this._elements__get(this._dom);
+        let elements = this.elements__get(this._dom, this._elements);
 
         for (let [key, value] of Object.entries(this.elements_classes)) {
             let element = elements[key];
@@ -158,6 +127,37 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         }
 
         element.setAttribute(attribute_name, attribute_value);
+    }
+
+    static elements__get(dom, elements_descriptors) {
+        let elements = {};
+
+        for (let [key, value] of Object.entries(elements_descriptors)) {
+            if (value instanceof Array) {
+                let elements_sub = [];
+                let selectors = value;
+
+                for (let selector of selectors) {
+                    elements_sub.push(...dom.querySelectorAll(selector));
+                }
+
+                elements[key] = elements_sub;
+            }
+            else {
+                let selector = value;
+
+                if (!selector) {
+                    selector = `.${key}`;
+                }
+                else if (selector.length == 1) {
+                    selector = `${selector}${key}`;
+                }
+
+                elements[key] = dom.querySelector(selector);
+            }
+        }
+
+        return elements;
     }
 
     static css__get(element, prop_name) {
@@ -386,11 +386,11 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     }
 
 
-    _attributes = null;
+    _attributes = {};
     _attributes_observing = false;
     _built = new ExternalPromise();
-    _elements = null;
-    _slots = null;
+    _elements = {};
+    _slots = {};
     _shadow = null;
 
 
@@ -469,7 +469,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
             this._shadow = this.attachShadow(this.constructor.shadow_opts);
             this._shadow.append(this.constructor._dom.cloneNode(true));
 
-            this._elements = this.constructor._elements__get(this._shadow);
+            this._elements = this.constructor.elements__get(this._shadow, this.constructor._elements);
             this._slots__define();
 
             await Promise.all([

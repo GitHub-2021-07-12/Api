@@ -68,13 +68,19 @@
             // repeaters[1].delegate = repeaters[0].delegate;
             // repeaters[1].Manager = repeaters[0].Manager;
             repeaters[1].model = model;
-            repeaters[1].refresh();
+            // repeaters[1].refresh();
 
             button_add.addEventListener('click', (event) => {
-                model.add({
-                    data: Math.random(),
-                    selected: true,
-                })
+                let items = [
+                    {
+                        data: Math.random() + '',
+                        selected: true,
+                    },
+                    {
+                        data: Math.random() + '',
+                    },
+                ];
+                model.add(items, 2);
             });
 
             button_delete.addEventListener('click', (event) => {
@@ -95,9 +101,10 @@
             repeaters[0].addEventListener('click', (event) => {
                 if (!event.target.Repeater__manager) return;
 
-                let key = event.target.Repeater__manager._key;
-                let model_item = model.get(key);
-                model.update(key, {selected: !model_item.selected});
+                // let key = event.target.Repeater__manager._key;
+                // let model_item = model.get(key);
+                let model_item = event.target.Repeater__manager._model_item;
+                model.update(model_item._index, {selected: !model_item.selected});
             });
 
 
@@ -115,15 +122,41 @@
         <x-repeater interpolation_='repeater'>
             <template Repeater__delegate>
                 <div>
-                    <span id='label_index'></span><span>: </span>
-                    <input id='input' value='{{repeater: _index}} - {{repeater: data}}'></input>
-                    <button id='button_remove'>X</button>
+                    <span class='label_index'></span>:
+                    <input class='input' value='{{repeater: data}}'></input>
+                    <button class='button_remove'>X</button>
+                    <button class='button_move_left'><-</button>
+                    <button class='button_move_right'>-></button>
                 </div>
 
                 <script>
                     class Manager extends Repeater.Manager {
+                        static _elements = {
+                            button_move_left: '',
+                            button_move_right: '',
+                            button_remove: '',
+                            input: '',
+                            label_index: '',
+                        };
+
+
+                        _button_move_left__on_click() {
+                            this._model.move(this._model_item._index, this._model_item._index - 1);
+                        }
+
+                        _button_move_right__on_click() {
+                            this._model.move(this._model_item._index, this._model_item._index + 1);
+                        }
+
                         _button_remove__on_click() {
-                            this._model.delete(this._key);
+                            this._model.delete(this._model_item._index);
+                        }
+
+                        _eventListeners__define() {
+                            this._elements.input.addEventListener('input', this._input__on_input.bind(this));
+                            this._elements.button_move_left.addEventListener('click', this._button_move_left__on_click.bind(this));
+                            this._elements.button_move_right.addEventListener('click', this._button_move_right__on_click.bind(this));
+                            this._elements.button_remove.addEventListener('click', this._button_remove__on_click.bind(this));
                         }
 
                         _input__on_input() {
@@ -141,17 +174,14 @@
                             let props = {
                                 data: this._elements.input.value,
                             };
-                            this._model.update(this._key, props);
+                            this._model.update(this._model_item._index, props);
                         }
 
                         index__apply() {
-                            this._elements.label_index.textContent = `${this._model_item._index} (${this._key})`;
+                            this._elements.label_index.textContent = this._model_item._index;
                         }
 
                         init() {
-                            this._elements.input.addEventListener('input', this._input__on_input.bind(this));
-                            this._elements.button_remove.addEventListener('click', this._button_remove__on_click.bind(this));
-
                             this.data__apply();
                             this.index__apply();
                         }

@@ -1,9 +1,10 @@
 // 23.04.2024
 
 
-import {Common} from '../../Units/Common/Common.js';
 import {Component} from '../Component/Component.js';
 import {Flickable} from '../Flickable/Flickable.js';
+
+import {Common} from '../../Units/Common/Common.js';
 
 
 export class TextArea extends Component {

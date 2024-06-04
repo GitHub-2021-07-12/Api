@@ -1,9 +1,10 @@
 // 19.03.2024
 
 
+import {SwipeArea} from '../SwipeArea/SwipeArea.js';
+
 import {Common} from '../../Units/Common/Common.js';
 import {Renderer} from '../../Units/Renderer/Renderer.js';
-import {SwipeArea} from '../SwipeArea/SwipeArea.js';
 
 
 export class Leafable extends SwipeArea {

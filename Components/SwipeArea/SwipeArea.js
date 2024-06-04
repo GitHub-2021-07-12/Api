@@ -2,6 +2,7 @@
 
 
 import {Component} from '../Component/Component.js';
+
 import {Vector_2d} from '../../Units/Vector_2d/Vector_2d.js';
 
 

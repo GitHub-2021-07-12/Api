@@ -1,9 +1,8 @@
-// 02.06.2024
+// 15.04.2023; 02.2024
 
-
-import {Component} from '../Component/Component.js';
 
 import {Common} from '../../Units/Common/Common.js';
+import {Component} from '../Component/Component.js';
 import {Model} from '../../Units/Model/Model.js';
 
 
@@ -20,26 +19,34 @@ export class Repeater extends Component {
     };
 
 
+    static delegate_selector = 'template[Repeater__delegate]';
+    static item_filtered_attribute = '_Repeater__filtered';
+    static model_selector = 'template[Repeater__model]';
+
     static Manager = class Manager {
-        static _elements = {};
-
-
-        _elements = {};
+        _elements = null;
         _item = null;
+        _key = null;
         _model = null;
         _model_item = null;
 
 
-        _eventListeners__define() {}
+        _elements__define() {
+            let elements = this._item.querySelectorAll('[id]');
+            this._elements = {};
+
+            for (let element of elements) {
+                this._elements[element.id] = element;
+            }
+        }
 
 
-        constructor({item, model, model_item} = {}) {
+        constructor({item, key, model} = {}) {
             this._item = item;
+            this._key = key;
             this._model = model;
-            this._model_item = model_item;
-
-            this._elements = Component.elements__get(this._item, this.constructor._elements);
-            this._eventListeners__define();
+            this._model_item = this._model.get(this._key);
+            this._elements__define();
         }
 
         data__apply() {}
@@ -69,6 +76,7 @@ export class Repeater extends Component {
         add: this._model__on_add.bind(this),
         clear: this._model__on_clear.bind(this),
         delete: this._model__on_delete.bind(this),
+        fill: this._model__on_fill.bind(this),
         filter: this._model__on_filter.bind(this),
         order: this._model__on_order.bind(this),
         update: this._model__on_update.bind(this),
@@ -81,18 +89,18 @@ export class Repeater extends Component {
     get delegate() {
         return this._delegate;
     }
-    set delegate(delegate) {
-        if (delegate instanceof HTMLTemplateElement) {
-            this._delegate = delegate.content.firstElementChild;
+    set delegate(arg) {
+        if (arg instanceof HTMLTemplateElement) {
+            let [delegate, script] = arg.content.children;
 
-            let script = delegate.content.querySelector('script');
+            this._delegate = delegate || null;
 
             if (script) {
                 this.Manager = Common.execute_expression(script.text, {Repeater: this.constructor}) || this.Manager;
             }
         }
         else {
-            this._delegate = delegate;
+            this._delegate = arg;
         }
 
         this._delegate_html = this.interpolation && this._delegate?.outerHTML || '';
@@ -150,7 +158,7 @@ export class Repeater extends Component {
             }
         }
 
-        this.refresh();
+        // this.refresh();
     }
 
 
@@ -165,68 +173,68 @@ export class Repeater extends Component {
         this._content_initial__define();
         this.props__sync('model', 'target');
 
-        this.delegate = this._content_initial.querySelector('[Repeater__delegate]');
+        this.delegate = this._content_initial.querySelector(this.constructor.delegate_selector);
         this._model_data__define();
 
         this.refresh();
     }
 
-    _item__create(model_item) {
+    _item__create(key, model_item = null) {
+        model_item ||= this.model.get(key);
+
         let item = null;
 
         if (this.interpolation) {
             this._item_template.innerHTML = this.constructor.interpolate(this._delegate_html, this.interpolation, model_item);
-            item = this._item_template.content.firstElementChild;
+            item = this._item_template.content.children[0];
         }
         else {
             item = this.delegate.cloneNode(true);
         }
 
         if (this.model instanceof Model) {
-            item.Repeater__manager = new this.Manager({
-                item,
-                model: this.model,
-                model_item,
-            });
-            this._items.set(model_item, item);
+            item.Repeater__manager = new this.Manager({item, key, model: this.model});
+            this.constructor.attribute__set(item, this.constructor.item_filtered_attribute, model_item._filtered);
         }
+
+        this._items.set(key, item);
 
         return item;
     }
 
-    _item__update(model_item) {
+    _item__update(key) {
         if (!this.delegate) return;
 
         if (this.interpolation) {
-            let item_prev = this._items.get(model_item);
-            let item = this._item__create(model_item);
-            item_prev.replaceWith(item);
+            let item_prev = this._items.get(key);
+            let item = this._item__create(key);
+            item_prev ? item_prev.replaceWith(item) : this.target.append(item);
         }
-        else if (this.model instanceof Model) {
-            let item = this._items.get(model_item);
-            item.Repeater__manager.data__apply();
+        else {
+            let item = this._items.get(key);
+            item.Repeater__manager?.data__apply();
         }
     }
 
     async _items__add(model_items) {
         if (!this.delegate) return;
 
-        let index = Infinity;
         let items = [];
 
-        for (let model_item of model_items) {
-            index = Math.min(index, model_item._index);
-
-            let item = this._item__create(model_item);
+        for (let key of model_items.keys()) {
+            let item = this._item__create(key);
             items.push(item);
         }
 
-        let item = this.target.children[index];
-        item ? item.before(...items) : this.target.append(...items);
+        this.target.append(...items);
         await this._items__await(items);
 
-        this._items__init(items);
-        this._items_indexes__apply();
+        for (let item of items) {
+            item.Repeater__manager?.init();
+        }
+
+        // let promises = items.map((item) => item.Repeater__manager?.init());
+        // await Promise.allSettled(promises);
 
         this.event__dispatch('add', {items});
     }
@@ -234,14 +242,6 @@ export class Repeater extends Component {
     async _items__await(items) {
         let promises = items.map((item) => item._built);
         await Promise.all(promises);
-    }
-
-    _items__init(items) {
-        if (!(this.model instanceof Model)) return;
-
-        for (let item of items) {
-            item.Repeater__manager.init();
-        }
     }
 
     _items__clear() {
@@ -256,8 +256,8 @@ export class Repeater extends Component {
         this._items__clear();
 
         if (this.model instanceof Model) {
-            for (let model_item of this.model._items) {
-                let item = this._item__create(model_item);
+            for (let key of this.model._items_keys) {
+                let item = this._item__create(key);
                 items.push(item);
             }
         }
@@ -267,17 +267,20 @@ export class Repeater extends Component {
                     _index: i,
                     data: i + 1,
                 };
-                let item = this._item__create(model_item);
+                let item = this._item__create(i, model_item);
                 items.push(item);
             }
         }
 
-        if (!items.length) return;
-
         this.target.append(...items);
         await this._items__await(items);
 
-        this._items__init(items);
+        for (let item of items) {
+            item.Repeater__manager?.init();
+        }
+
+        // let promises = items.map((item) => item.Repeater__manager?.init());
+        // await Promise.allSettled(promises);
 
         this.event__dispatch('define', {items});
     }
@@ -289,11 +292,13 @@ export class Repeater extends Component {
             return;
         }
 
-        for (let model_item of model_items) {
-            let item = this._items.get(model_item);
-            item.remove();
+        for (let key of model_items.keys()) {
+            let item = this._items.get(key);
 
-            this._items.delete(model_item);
+            if (!item) continue;
+
+            item.remove();
+            this._items.delete(key);
         }
 
         this._items_indexes__apply();
@@ -302,8 +307,9 @@ export class Repeater extends Component {
     }
 
     _items__filter() {
-        for (let [model_item, item] of this._items) {
-            this.constructor.attribute__set(item, '_Repeater__filtered', model_item._filtered);
+        for (let [key, item] of this._items) {
+            let model_item = this.model.get(key);
+            this.constructor.attribute__set(item, this.constructor.item_filtered_attribute, model_item._filtered);
         }
 
         this.event__dispatch('filter');
@@ -316,7 +322,13 @@ export class Repeater extends Component {
             return;
         }
 
-        let items = this.model._items.map((model_item) => this._items.get(model_item));
+        let items = [];
+
+        for (let key of this.model._items_keys) {
+            let item = this._items.get(key);
+            items.push(item);
+        }
+
         this.target.textContent = '';
         this.target.append(...items);
 
@@ -326,10 +338,8 @@ export class Repeater extends Component {
     }
 
     _items_indexes__apply() {
-        if (!(this.model instanceof Model)) return;
-
         for (let item of this._items.values()) {
-            item.Repeater__manager.index__apply();
+            item.Repeater__manager?.index__apply();
         }
     }
 
@@ -345,6 +355,10 @@ export class Repeater extends Component {
         this._items__delete(event.detail.items);
     }
 
+    _model__on_fill() {
+        this._items__define();
+    }
+
     _model__on_filter() {
         this._items__filter();
     }
@@ -354,22 +368,19 @@ export class Repeater extends Component {
     }
 
     _model__on_update(event) {
-        this._item__update(event.detail.item);
+        this._item__update(event.detail.key);
     }
 
     _model_data__define() {
         if (!(this.model instanceof Model)) return;
 
-        let template = this._content_initial.querySelector('[Repeater__model]');
-        let script = template?.content.firstElementChild;
+        let template = this._content_initial.querySelector(this.constructor.model_selector);
+        let script = template?.content.children[0];
 
         if (!script) return;
 
-        let items = Common.execute_expression(script.text);
-
-        if (!items) return;
-
-        this.model.add(items);
+        let items = Common.execute_expression(script.text) || [];
+        this.model.fill(items);
     }
 
 

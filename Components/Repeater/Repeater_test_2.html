@@ -52,6 +52,8 @@
             import {Repeater} from './Repeater.js';
 
             await Repeater._defined;
+            await repeater_1._built;
+            await repeater_2._built;
 
 
             // repeater_1.model = new Model();
@@ -118,13 +120,22 @@
             <template Repeater__delegate>
                 <svg>
                     <!-- <circle id='circle' r='{{repeater: radius}}' fill='{{repeater: color}}' cx='{{repeater: x}}' cy='{{repeater: y}}'></circle> -->
-                    <circle id='circle'></circle>
+                    <circle class='circle'></circle>
                 </svg>
 
                 <script>
                     class Manager extends Repeater.Manager {
+                        static _elements = {
+                            circle: '',
+                        };
+
+
+                        _eventListeners__define() {
+                            this._item.addEventListener('click', this._on_click.bind(this));
+                        }
+
                         _on_click() {
-                            this._model.delete(this._key);
+                            this._model.delete(this._model_item._index);
                         }
 
 
@@ -136,7 +147,6 @@
                         }
 
                         init() {
-                            this._item.addEventListener('click', this._on_click.bind(this));
                             this.data__apply();
                         }
                     }
