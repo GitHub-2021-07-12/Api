@@ -1,5 +1,7 @@
 @layer init {
     :host {
+        --_Flickable__puck__margin_inner: calc(-1 * var(--Flickable__puck__margin_inner));
+        --_Flickable__puck__margin_outer: calc(-1 * var(--Flickable__puck__margin_outer));
         --_Flickable__puck_x__length: 0;
         --_Flickable__puck_y__length: 0;
         --_Flickable__scrollBar_phantom__margin: calc(-1 * var(--Flickable__scrollBar__width));
@@ -9,7 +11,6 @@
         --Flickable__puck__length_min: 20%;
         --Flickable__puck__margin_inner: 2px;
         --Flickable__puck__margin_outer: 2px;
-        --Flickable__scrollBar__padding: 2px;
         --Flickable__scrollBar__width: 10px;
 
         display: block;
@@ -64,27 +65,27 @@
 
     .scrollBar {
         --TrackBar__length: auto !important;
-        --TrackBar__padding: var(--Flickable__scrollBar__padding);
+        --TrackBar__padding: 2px;
         --TrackBar__rounding: var(--TrackBar__width);
-        --TrackBar__width: var(--Flickable__scrollBar__width);
+        --TrackBar__width: var(--Flickable__scrollBar__width) !important;
         background: transparent;
         border-radius: 0;
         display: none !important;
     }
 
     .scrollBar_x {
-        --TrackBar__puck__length: max(var(--Flickable__puck__length_min), var(--_Flickable__puck_x__length) * 1px);
+        --TrackBar__puck__length: max(var(--Flickable__puck__length_min), var(--_Flickable__puck_x__length) * 1px) !important;
         overflow-x: clip !important;
 
         &::part(handle) {
-            margin: calc(-1 * var(--Flickable__puck__margin_inner)) 0 calc(-1 * var(--Flickable__puck__margin_outer)) 0;
+            margin: var(--_Flickable__puck__margin_inner) 0 var(--_Flickable__puck__margin_outer) 0 !important;
         }
 
         :host([scrollBars='phantom']) & {
             margin-top: var(--_Flickable__scrollBar_phantom__margin) !important;
 
             :host([_scroll_y]) & {
-                margin-right: var(--Flickable__scrollBar__width);
+                margin-right: var(--TrackBar__width) !important;
             }
         }
         :host([_scroll_x]:not([scrollBars='hidden'])) & {
@@ -93,18 +94,18 @@
     }
 
     .scrollBar_y {
-        --TrackBar__puck__length: max(var(--Flickable__puck__length_min), var(--_Flickable__puck_y__length) * 1px);
+        --TrackBar__puck__length: max(var(--Flickable__puck__length_min), var(--_Flickable__puck_y__length) * 1px) !important;
         overflow-y: clip !important;
 
         &::part(handle) {
-            margin: 0 calc(-1 * var(--Flickable__puck__margin_outer)) 0 calc(-1 * var(--Flickable__puck__margin_inner));
+            margin: 0 var(--_Flickable__puck__margin_outer) 0 var(--_Flickable__puck__margin_inner) !important;
         }
 
         :host([scrollBars='phantom']) & {
-            margin-left: var(--_Flickable__scrollBar_phantom__margin);
+            margin-left: var(--_Flickable__scrollBar_phantom__margin) !important;
 
             :host([_scroll_x]) & {
-                margin-bottom: var(--Flickable__scrollBar__width);
+                margin-bottom: var(--TrackBar__width) !important;
             }
         }
         :host([_scroll_y]:not([scrollBars='hidden'])) & {
