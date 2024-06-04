@@ -1,7 +1,12 @@
 @layer init {
     :host {
+        --_TextArea__padding: var(--TextArea__padding_vertical) var(--TextArea__padding_horizontal);
+
+
         --TextArea__gap: 0px;
         --TextArea__padding: var(--TextArea__gap);
+        --TextArea__padding_horizontal: var(--TextArea__padding);
+        --TextArea__padding_vertical: var(--TextArea__padding);
         --TextArea__placeholder_color: currentColor;
         --TextArea__placeholder_opacity: 0.4;
         --TextArea__puck__length_min: 20%;
@@ -15,7 +20,7 @@
         font-family: 'Arial';
         line-height: 1.5;
         max-height: 120px;
-        padding: var(--TextArea__padding) !important;
+        padding: var(--_TextArea__padding) !important;
         width: 400px;
     }
     :host([_focused]) {
@@ -42,14 +47,19 @@
         color: inherit;
         font: inherit;
         height: 100%;
-        margin: calc(-1 * var(--TextArea__padding)) !important;
-        outline: none !important;
-        padding: var(--TextArea__padding) !important;
+        margin: calc(-1 * var(--TextArea__padding_vertical)) calc(-1 * var(--TextArea__padding_horizontal)) !important;
+        outline: none;
+        padding: var(--_TextArea__padding) !important;
         resize: none !important;
 
         &::placeholder {
             color: var(--TextArea__placeholder_color);
             opacity: var(--TextArea__placeholder_opacity);
+        }
+
+        .flickable[_scroll_y] & {
+            margin-right: 0 !important;
+            padding-right: 0 !important;
         }
     }
 

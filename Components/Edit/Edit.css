@@ -86,7 +86,6 @@
         border: none;
         color: inherit;
         font: inherit;
-        /* line-height: 1.5; */
         outline: none;
         padding: var(--Edit__padding_vertical) var(--Edit__padding_horizontal) !important;
 
