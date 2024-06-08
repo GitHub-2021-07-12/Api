@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+
+<html>
+    <head>
+        <meta charset='utf-8' content='user-scalable=no, width=720' name='viewport'>
+        <title>Select</title>
+
+        <style>
+            :not(:defined) {
+                display: none;
+            }
+        </style>
+
+        <script type='module'>
+            let {Select} = await import('./Select.js');
+            await Select._defined;
+
+
+        </script>
+    </head>
+
+    <body>
+        <x-select>
+            <div Select__delegate>Delegate</div>
+
+            <template Select__model>
+                <script>
+                    [
+                        'Item_1', 'Item_2',
+                    ]
+                </script>
+            </template>
+        </x-select>
+    </body>
+</html>

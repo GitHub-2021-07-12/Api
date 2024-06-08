@@ -5,7 +5,7 @@
         --Edit__padding_horizontal: var(--Edit__padding);
         --Edit__padding_vertical: var(--Edit__padding);
         --Edit__placeholder_color: currentColor;
-        --Edit__placeholder_opacity: 0.4;
+        --Edit__placeholder_opacity: 0.2;
 
         border: 1px solid #888;
         border-radius: 2px;

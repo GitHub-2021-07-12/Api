@@ -177,18 +177,23 @@ export class Edit extends Component {
         return this._value;
     }
     set value(value) {
+        this._invalid = false;
         this._value = value + '';
         this._chars = this._string_chars__get(this._value);
         this._elements.input.value = this.masked ? this._value_masked__get() : this._value;
-        this.attribute__set('_invalid', false);
     }
 
 
-    _button_clear__on_pointerDown() {
+    async _button_clear__on_pointerDown(event) {
+        event.preventDefault();
+
         this.value = '';
+        // requestAnimationFrame(() => this.focus());
     }
 
-    _button_mask__on_pointerDown() {
+    _button_mask__on_pointerDown(event) {
+        event.preventDefault();
+
         this.masked = !this.masked;
     }
 
@@ -244,7 +249,7 @@ export class Edit extends Component {
         this._value__change(event.data, event.inputType);
     }
 
-    _input__on_compositionStart(event) {
+    _input__on_compositionStart() {
         // console.log('compositionstart')
 
         this._input_value = this._elements.input.value;
@@ -311,14 +316,14 @@ export class Edit extends Component {
             else if (inputType == 'deleteContentForward') {
                 chars_right.shift();
             }
-            else if (this._value.length >= this.length_max) {
+            else if (this._chars.length >= this.length_max) {
                 data = '';
             }
         }
 
         chars_left.push(...this._string_chars__get(data));
         this._chars = [...chars_left, ...chars_right];
-        this._value = this._chars.join('').slice(0, this.length_max);
+        this._value = this._chars.slice(0, this.length_max).join('');
 
         if (this.masked) {
             this._elements.input.value = this._value_masked__get();
@@ -350,7 +355,7 @@ export class Edit extends Component {
     }
 
     validate() {
-        let valid = this._regExp.test(this.value);
+        let valid = this.regExp.test(this.value);
         this._invalid = !valid;
 
         return valid;

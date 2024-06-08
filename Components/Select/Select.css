@@ -1,0 +1,22 @@
+@layer init {
+    :host {
+        display: block;
+        width: 200px;
+    }
+
+
+    .edit {
+        display: block;
+        width: unset;
+    }
+
+    .list {
+        border: 1px solid #888;
+        border-radius: 2px;
+        height: 100px;
+    }
+
+    .root {
+        display: contents;
+    }
+}

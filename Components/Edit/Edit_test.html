@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 
+
 <html>
     <head>
         <meta charset='utf-8'>
@@ -12,49 +13,36 @@
             }
 
 
-            body * {
-                vertical-align: middle;
-            }
-
-
-            #edit_1 {
-                /* color: red; */
-                /* caret-color: blue; */
+            .edit_1 {
+                caret-color: blue;
                 font: 50px 'Arial';
-                padding: 8px;
                 width: 600px;
 
                 &::part(button) {
-                    /* border: 1px solid #888; */
                     height: 48px;
-                    stroke: blue;
+                    /* stroke: blue; */
                     width: 48px;
                 }
-                &::part(button):hover {
-                    stroke: red;
-                }
+                /* &::part(button):hover { */
+                /*     stroke: red; */
+                /* } */
 
-                &::part(button_clear)::after {
-                    background: blue;
-                    content: '';
-                    display: block;
-                    inset: 0;
-                    mask: center no-repeat url('./Edit.svg#eye_open');
-                    position: absolute;
-                }
-                &::part(button_clear):hover::after {
-                    background: red;
-                }
+                /* &::part(button_clear)::after { */
+                /*     background: blue; */
+                /*     content: ''; */
+                /*     display: block; */
+                /*     inset: 0; */
+                /*     mask: center no-repeat url('./Edit.svg#eye_open'); */
+                /*     position: absolute; */
+                /* } */
+                /* &::part(button_clear):hover::after { */
+                /*     background: red; */
+                /* } */
             }
 
 
-            .icon {
-                display: block;
-                fill: none;
-                height: 48px;
-                stroke-linecap: round;
-                stroke-linejoin: round;
-                width: 48px;
+            [_building] {
+                display: none;
             }
         </style>
 
@@ -65,40 +53,91 @@
 
             // Edit.elements_classes.button_clear = 'a b c';
             // Edit.elements_classes.input = ['a', 'b', 'c'];
-            Edit.elements_classes = {
-                button_clear: 'a b c',
-                input: ['a', 'b', 'c'],
-            };
-            Edit.resources.button_mask__on = './Edit.svg#eye_open';
+            // Edit.elements_classes = {
+            //     button_clear: 'a b c',
+            //     input: ['a', 'b', 'c'],
+            // };
+            // Edit.resources.button_mask__on = './Edit.svg#eye_open';
 
+            // document.body.hidden = true;
             await Edit._defined;
             await Promise.all([...edits].map((item) => item._built));
+            // document.body.hidden = false;
 
+            edits[0].masked = true;
             edits[0].value = '123';
-            // edits[1].value = 'q👨‍👩‍👧‍👦e';
+
+
+            let inputs = document.querySelectorAll('input');
+
+            // addEventListener('click', () => {
+            //     console.log(input.selectionStart, input.selectionEnd)
+            // });
+
+            Edit.eventListeners__add(
+                inputs[0],
+                {
+                    contextmenu: (event) => {
+                        inputs[1].selectionEnd = inputs[0].selectionEnd;
+                        inputs[1].selectionStart = inputs[0].selectionStart;
+                        inputs[1].focus();
+                    },
+                    keydown: (event) => {
+                        console.log(inputs[0].selectionStart, inputs[0].selectionEnd)
+
+                        inputs[1].focus();
+                        inputs[1].selectionEnd = inputs[0].selectionEnd;
+                        inputs[1].selectionStart = inputs[0].selectionStart;
+                    },
+                    click: (event) => {
+                        // event.preventDefault();
+
+                        // inputs[1].focus();
+                        // inputs[1].selectionEnd = inputs[0].selectionEnd;
+                        // inputs[1].selectionStart = inputs[0].selectionStart;
+                    },
+                    // select: (event) => {
+                    //     event.preventDefault();
+
+                    //     inputs[1].focus();
+                    // },
+                },
+            );
+
+            Edit.eventListeners__add(
+                inputs[1],
+                {
+                    input: (event) => {
+                        inputs[0].value = inputs[1].value;
+                        // inputs[0].value = inputs[1].value.replace(/./g, '👨‍👩‍👧‍👧');
+
+                        inputs[0].focus();
+                        inputs[0].selectionEnd = inputs[1].selectionEnd;
+                        inputs[0].selectionStart = inputs[1].selectionStart;
+                    },
+                },
+            );
         </script>
     </head>
 
     <body>
         <x-edit
-            id='edit_1'
+            class='edit_1'
 
             button_clear
             button_mask
             dragAndDrop
+            length_max='20'
             mask_char='👨‍👩‍👧‍👦12'
-            multiline
             placeholder='password'
             regExp='^[^@\s]+?@[^\.\s]+?\.[^\.\s]+$'
             template='+7 ([1-79][\d][\d]) [\d][\d][\d]-[\d][\d]-[\d][\d]'
             template_char='⚽23'
         >
-            <meta slot='button_clear'>
+            <!-- <meta slot='button_clear'> -->
         </x-edit>
 
-        <!-- <x-edit id='edit_2' button_clear button_mask disabled_ mask_char='⭐' masked></x-edit> -->
-
-        <!-- <input disabled value='qqq⭐⭐⭐eee'></input> -->
-        <!-- <input placeholder='password' type='password'></input> -->
+        <input disabled_ readOnly_ tabIndex='-1'></input>
+        <input></input>
     </body>
 </html>
