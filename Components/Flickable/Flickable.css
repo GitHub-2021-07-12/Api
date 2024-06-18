@@ -17,13 +17,19 @@
     }
 
 
-    slot[name='display']::slotted(*) {
-        overflow: auto !important;
-        scrollbar-width: none !important;
-        touch-action: none !important;
+    slot[name='display'] {
+        &::slotted(*) {
+            overflow: auto !important;
+            scrollbar-width: none !important;
+            touch-action: none !important;
+        }
 
         &::-webkit-scrollbar {
             display: none !important;
+        }
+
+        :host([disabled]) &::slotted(*) {
+            overflow: hidden !important;
         }
     }
 
@@ -41,6 +47,10 @@
 
         &::-webkit-scrollbar {
             display: none !important;
+        }
+
+        :host([disabled]) & {
+            overflow: hidden !important;
         }
     }
 
@@ -71,6 +81,11 @@
         background: transparent;
         border-radius: 0;
         display: none !important;
+        pointer-events: none;
+
+        &::part(handle) {
+            pointer-events: initial !important;
+        }
     }
 
     .scrollBar_x {

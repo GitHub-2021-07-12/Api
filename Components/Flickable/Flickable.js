@@ -1,14 +1,14 @@
 // 04.03.2024
 
 
-import {SwipeArea} from '../SwipeArea/SwipeArea.js';
+import {GestureArea} from '../GestureArea/GestureArea.js';
 import {TrackBar} from '../TrackBar/TrackBar.js';
 
 import {Renderer} from '../../Units/Renderer/Renderer.js';
 import {Vector_2d} from '../../Units/Vector_2d/Vector_2d.js';
 
 
-export class Flickable extends SwipeArea {
+export class Flickable extends GestureArea {
     static _components = [TrackBar];
 
     static _attributes = {
@@ -125,11 +125,23 @@ export class Flickable extends SwipeArea {
         this._attribute__set('acceleration', acceleration);
     }
 
+    get disabled() {
+        return this._attributes.disabled;
+    }
+    set disabled(disabled) {
+        this._attribute__set('disabled', disabled);
+
+        this._elements.scrollBar_x.disabled = this.disabled;
+        this._elements.scrollBar_y.disabled = this.disabled;
+        this._pointers__release();
+    }
+
     get gain() {
         return this._attributes.gain;
     }
     set gain(gain) {
         this._attribute__set('gain', gain);
+
         this._elements.scrollBar_x.gain = gain;
         this._elements.scrollBar_y.gain = gain;
     }
@@ -160,6 +172,7 @@ export class Flickable extends SwipeArea {
     }
     set scrollBars(scrollBars) {
         this._attribute__set('scrollBars', scrollBars);
+
         this.refresh();
     }
 
@@ -175,6 +188,7 @@ export class Flickable extends SwipeArea {
     }
     set shift(shift) {
         this._attribute__set('shift', shift);
+
         this._elements.scrollBar_x.shift = shift;
         this._elements.scrollBar_y.shift = shift;
     }
@@ -184,6 +198,7 @@ export class Flickable extends SwipeArea {
     }
     set shift_jump(shift_jump) {
         this._attribute__set('shift_jump', shift_jump);
+
         this._elements.scrollBar_x.shift_jump = shift_jump;
         this._elements.scrollBar_y.shift_jump = shift_jump;
     }
@@ -210,38 +225,32 @@ export class Flickable extends SwipeArea {
     }
 
 
+    _display__on_scroll() {
+        cancelAnimationFrame(this._animationFrame);
+        this._animationFrame = requestAnimationFrame(this._scrollBars_values__define);
+
+        this._scrollEdges__define();
+        this._sticky_x = this._scrollEdge_x_end || !this._scroll_x;
+        this._sticky_y = this._scrollEdge_y_end || !this._scroll_y;
+    }
+
     _eventListeners__define() {
         super._eventListeners__define();
 
         this.eventListeners__add({
-            capture: this._on_capture,
             flick: this._on_flick,
-            pointerdown: this._on_pointerDown,
             swipe: this._on_swipe,
             swipe_begin: this._on_swipe_begin,
         });
         this._elements.scrollBar_x.addEventListener('change', this._scrollBar_x__on_value_change.bind(this));
         this._elements.scrollBar_y.addEventListener('change', this._scrollBar_y__on_value_change.bind(this));
-        this._slots.display.addEventListener('scroll', this._on_scroll.bind(this));
+        this._slots.display.addEventListener('scroll', this._display__on_scroll.bind(this));
     }
 
     _init() {
         super._init();
 
         this.refresh();
-    }
-
-    _on_capture(event) {
-        try {
-            let snag = event.detail.target.closest(this.snag);
-
-            if (!this.contains(snag)) return;
-        }
-        catch {
-            return;
-        }
-
-        event.preventDefault();
     }
 
     _on_flick(event) {
@@ -258,15 +267,6 @@ export class Flickable extends SwipeArea {
         this._renderer.stop();
     }
 
-    _on_scroll() {
-        cancelAnimationFrame(this._animationFrame);
-        this._animationFrame = requestAnimationFrame(this._scrollBars_values__define);
-
-        this._scrollEdges__define();
-        this._sticky_x = this._scrollEdge_x_end || !this._scroll_x;
-        this._sticky_y = this._scrollEdge_y_end || !this._scroll_y;
-    }
-
     _on_swipe(event) {
         let pointer = event.detail._pointer;
         this.scroll_x = this._scroll_x_initial - pointer.position_delta.x;
@@ -274,6 +274,14 @@ export class Flickable extends SwipeArea {
     }
 
     _on_swipe_begin(event) {
+        let target = event.detail._pointer.target;
+
+        if (target instanceof TrackBar || this._snag__check(target)) {
+            event.preventDefault();
+
+            return;
+        }
+
         this._scroll_x_initial = this.scroll_x;
         this._scroll_y_initial = this.scroll_y;
     }
@@ -349,6 +357,19 @@ export class Flickable extends SwipeArea {
         if (this._scroll_y) {
             this._elements.scrollBar_y.value = this.scroll_y / this._scroll_y_factor;
         }
+    }
+
+    _snag__check(element) {
+        try {
+            let snag = element.closest(this.snag);
+
+            if (!this.contains(snag)) return false;
+        }
+        catch {
+            return false;
+        }
+
+        return true;
     }
 
 

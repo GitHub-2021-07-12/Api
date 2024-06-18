@@ -129,6 +129,41 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         element.setAttribute(attribute_name, attribute_value);
     }
 
+    static coords__get(element) {
+        let domRect = element.getBoundingClientRect();
+
+        return {
+            x: domRect.x + window.scrollX - this.css_numeric__get('marginLeft'),
+            y: domRect.y + window.scrollY - this.css_numeric__get('marginTop'),
+        };
+    }
+
+    static css__get(element, prop_name) {
+        return getComputedStyle(element)[prop_name];
+    }
+
+    static css_numeric__get(element, prop_name) {
+        let prop_value = this.css__get(element, prop_name);
+
+        return parseFloat(prop_value);
+    }
+
+    static async define() {
+        if (customElements.getName(this)) return;
+
+        this._tag = `${this.tag_prefix}-${this.name}`.toLowerCase();
+        this._defined = customElements.whenDefined(this._tag);
+        this._observedAttributes__define();
+
+        await new Promise(setTimeout);
+
+        await Promise.all([
+            this._components__await(),
+            this._dom__create(),
+        ]);
+        customElements.define(this._tag, this);
+    }
+
     static elements__get(dom, elements_descriptors) {
         let elements = {};
 
@@ -158,32 +193,6 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         }
 
         return elements;
-    }
-
-    static css__get(element, prop_name) {
-        return getComputedStyle(element)[prop_name];
-    }
-
-    static css_numeric__get(element, prop_name) {
-        let prop_value = this.css__get(element, prop_name);
-
-        return parseFloat(prop_value);
-    }
-
-    static async define() {
-        if (customElements.getName(this)) return;
-
-        this._tag = `${this.tag_prefix}-${this.name}`.toLowerCase();
-        this._defined = customElements.whenDefined(this._tag);
-        this._observedAttributes__define();
-
-        await new Promise(setTimeout);
-
-        await Promise.all([
-            this._components__await(),
-            this._dom__create(),
-        ]);
-        customElements.define(this._tag, this);
     }
 
     static height_inner__get(element) {
@@ -499,6 +508,16 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     _eventListeners__define() {}
 
+    _eventListeners_shadow__add(eventListeners, opts = null) {
+        let eventTarget = this._shadow ?? this;
+        this.constructor.eventListeners__add(eventTarget, eventListeners, opts);
+    }
+
+    _eventListeners_shadow__remove(eventListeners, opts = null) {
+        let eventTarget = this._shadow ?? this;
+        this.constructor.eventListeners__remove(eventTarget, eventListeners, opts);
+    }
+
     _init() {}
 
     _slots__define() {
@@ -530,6 +549,10 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     connectedCallback() {
         this._build();
+    }
+
+    coords__get() {
+        return this.constructor.coords__get(this);
     }
 
     css__get(prop_name) {

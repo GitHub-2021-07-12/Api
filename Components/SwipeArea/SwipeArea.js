@@ -113,11 +113,13 @@ export class SwipeArea extends Component {
     }
 
     _on_lostPointerCapture(event) {
+        console.log('lostpointercapture')
+
         let pointer = this._pointers.get(event.pointerId);
 
         if (!pointer) return;
 
-        event.stopPropagation();
+        // event.stopPropagation();
 
         if (pointer.active) {
             if (event.timeStamp - pointer.timeStamp <= this.flickTime_max) {
@@ -139,16 +141,19 @@ export class SwipeArea extends Component {
 
     _on_pointerDown(event) {
         if (this.disabled || this._pointers.size >= this.pointers_count_max || !this.event__dispatch('capture', {target: event.target})) return;
+        // if (event.SwipeArea__pointer_captured || this.disabled || this._pointers.size >= this.pointers_count_max || !this.event__dispatch('capture', {target: event.target})) return;
 
-        event.stopPropagation();
+        // event.stopPropagation();
 
         let pointer = new this.constructor._Pointer();
         pointer.id = event.pointerId;
-
         this._pointers.set(pointer.id, pointer);
 
+        event.SwipeArea__pointer_captured = true;
         this.addEventListener('pointermove', this._on_pointerMove);
         this.setPointerCapture(pointer.id);
+
+        setTimeout(() => console.log(this, this.hasPointerCapture(pointer.id)))
     }
 
     _on_pointerMove(event) {
@@ -156,7 +161,7 @@ export class SwipeArea extends Component {
 
         if (!pointer) return;
 
-        event.stopPropagation();
+        // event.stopPropagation();
 
         pointer.timeStamp = event.timeStamp;
         pointer.velocity.set(event.pageX, event.pageY).sub(pointer.position).prod(this.gain);

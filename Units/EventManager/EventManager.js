@@ -14,10 +14,16 @@ export class EventManager extends EventTarget {
 
 
     static event__dispatch(eventTarget, event_name, event_detail = null) {
-        return eventTarget.dispatchEvent(new CustomEvent(event_name, {cancelable: true, detail: event_detail}));
+        let event_opts = {
+            cancelable: true,
+            detail: event_detail,
+        };
+        let event = new CustomEvent(event_name, event_opts);
+
+        return eventTarget.dispatchEvent(event);
     }
 
-    static event__dispatch_async(eventTarget, event_name, event_detail = null) {
+    static event_async__dispatch(eventTarget, event_name, event_detail = null) {
         setTimeout(() => this.event__dispatch(eventTarget, event_name, event_detail));
     }
 
@@ -38,8 +44,8 @@ export class EventManager extends EventTarget {
         return this.constructor.event__dispatch(this, event_name, event_detail);
     }
 
-    event__dispatch_async(event_name, event_detail = null) {
-        return this.constructor.event__dispatch_async(this, event_name, event_detail);
+    event_async__dispatch(event_name, event_detail = null) {
+        return this.constructor.event_async__dispatch(this, event_name, event_detail);
     }
 
     eventListeners__add(eventListeners, opts = null) {

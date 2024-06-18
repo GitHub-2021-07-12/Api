@@ -2,6 +2,7 @@
     :host {
         display: block;
         width: 200px;
+        position: relative !important;
     }
 
 
@@ -10,13 +11,44 @@
         width: unset;
     }
 
-    .list {
+    .flickable {
         border: 1px solid #888;
         border-radius: 2px;
         height: 100px;
+        padding: 10px;
+
+        /* position: absolute; */
+        /* position: relative; */
+        /* inset: 0; */
+        /* top: 100%; */
+        /* top: 40px; */
+        /* width: 100%; */
+        /* box-sizing: border-box; */
+        /* display: unset; */
+        /* z-index: 1; */
+    }
+
+    .list {
+        border: none;
+        /* display: block; */
+        padding: 0;
+        width: 100%;
+
+        :host([open]) & {
+            display: block;
+        }
     }
 
     .root {
         display: contents;
+        /* position: relative; */
+    }
+
+
+    [popover] {
+        /* position: absolute; */
+        inset: unset;
+        /* width: 100%; */
+        box-sizing: border-box;
     }
 }

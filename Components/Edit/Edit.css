@@ -1,5 +1,6 @@
 @layer init {
     :host {
+        --Edit__button__size: 1.5em;
         --Edit__gap: 4px;
         --Edit__padding: var(--Edit__gap);
         --Edit__padding_horizontal: var(--Edit__padding);
@@ -10,6 +11,7 @@
         border: 1px solid #888;
         border-radius: 2px;
         display: inline-block;
+        font: 16px 'Arial';
         line-height: 1.5;
         overflow: hidden !important;
         padding: 0 !important;
@@ -26,7 +28,7 @@
         background: #eee;
         border-color: #ccc;
     }
-    :host(:is([button_clear], [button_mask])) {
+    :host(:is([_notEmpty][button_clear], [button_mask])) {
         padding-right: var(--Edit__padding_horizontal) !important;
     }
 
@@ -47,11 +49,11 @@
     .button {
         cursor: pointer;
         display: none !important;
-        height: 24px;
+        height: var(--Edit__button__size);
         outline: none;
         position: relative !important;
         stroke: #888;
-        width: 24px;
+        width: var(--Edit__button__size);
 
         &:hover {
             stroke: #000;
@@ -59,7 +61,7 @@
     }
 
     .button_clear {
-        :host([button_clear]:not([disabled])) & {
+        :host([_notEmpty][button_clear]:not([disabled])) & {
             display: block !important;
         }
     }
@@ -94,7 +96,7 @@
             opacity: var(--Edit__placeholder_opacity);
         }
 
-        :host(:is([button_clear], [button_mask])) & {
+        :host(:is([_notEmpty][button_clear], [button_mask])) & {
             padding-right: 0 !important;
         }
     }

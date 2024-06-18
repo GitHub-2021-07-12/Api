@@ -1,12 +1,12 @@
 // 08.01.2023
 
 
-import {SwipeArea} from '../SwipeArea/SwipeArea.js';
+import {GestureArea} from '../GestureArea/GestureArea.js';
 
 import {Vector_2d} from '../../Units/Vector_2d/Vector_2d.js';
 
 
-export class Draggable extends SwipeArea {
+export class Draggable extends GestureArea {
     static _attributes = {
         ...super._attributes,
 
@@ -118,35 +118,7 @@ export class Draggable extends SwipeArea {
     }
 
 
-    _drag(pointer_delta) {
-        this._pointer_delta
-            .set_vector(pointer_delta)
-            .sum(this._position_delta)
-            .length__to_range(0, this.radius)
-        ;
-
-        if (this.axis != 'x') {
-            let step = this.step_y || this.step;
-            this._position.y = this.position_initial.y + Math.round(this._pointer_delta.y / step) * step;
-        }
-
-        if (this.axis != 'y') {
-            let step = this.step_x || this.step;
-            this._position.x = this.position_initial.x + Math.round(this._pointer_delta.x / step) * step;
-        }
-
-        this._position.to_range(this._position_min, this._position_max).round();
-        this.position = this._position;
-    }
-
-    _drag__init(target) {
-        try {
-            let handle = target.closest(this.handle);
-
-            if (!this.contains(handle)) return false;
-        }
-        catch {}
-
+    _drag__init() {
         this._position.set_vector(this.position);
         this._position_delta.set_vector(this._position).sub(this.position_initial);
 
@@ -170,30 +142,64 @@ export class Draggable extends SwipeArea {
         else {
             this._position_min.set(-Infinity);
         }
+    }
 
-        return true;
+    _drag__make(pointer_delta) {
+        this._pointer_delta
+            .set_vector(pointer_delta)
+            .sum(this._position_delta)
+            .length__to_range(0, this.radius)
+        ;
+
+        if (this.axis != 'x') {
+            let step = this.step_y || this.step;
+            this._position.y = this.position_initial.y + Math.round(this._pointer_delta.y / step) * step;
+        }
+
+        if (this.axis != 'y') {
+            let step = this.step_x || this.step;
+            this._position.x = this.position_initial.x + Math.round(this._pointer_delta.x / step) * step;
+        }
+
+        this._position.to_range(this._position_min, this._position_max).round();
+        this.position = this._position;
+
+        this.event__dispatch('drag');
     }
 
     _eventListeners__define() {
         super._eventListeners__define();
 
         this.eventListeners__add({
-            capture: this._on_capture,
             swipe: this._on_swipe,
+            swipe_begin: this._on_swipe_begin,
             swipe_end: this._on_swipe_end,
         });
     }
 
-    _on_capture(event) {
-        if (this._drag__init(event.detail.target)) return;
+    _handle__check(element) {
+        try {
+            let handle = element.closest(this.handle);
 
-        event.preventDefault();
+            if (!this.contains(handle)) return false;
+        }
+        catch {}
+
+        return true;
     }
 
     _on_swipe(event) {
-        this._drag(event.detail._pointer.position_delta);
+        this._drag__make(event.detail._pointer.position_delta);
+    }
 
-        this.event__dispatch('drag');
+    _on_swipe_begin(event) {
+        if (!this._handle__check(event.detail.target)) {
+            event.preventDefault();
+
+            return;
+        }
+
+        this._drag__init();
     }
 
     _on_swipe_end(event) {

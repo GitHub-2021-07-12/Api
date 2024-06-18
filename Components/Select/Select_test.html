@@ -7,8 +7,25 @@
         <title>Select</title>
 
         <style>
-            :not(:defined) {
-                display: none;
+            * {
+                &:not(:defined) {
+                    display: none;
+                }
+
+
+                &[_building] {
+                    display: none;
+                }
+            }
+
+
+            x-select {
+                user-select: none;
+            }
+
+
+            .delegate {
+                color: red;
             }
         </style>
 
@@ -17,12 +34,15 @@
             await Select._defined;
 
 
+            // document.addEventListener('pointerdown', (event) => {
+            //     console.log(event.target, document.activeElement)
+            // });
         </script>
     </head>
 
     <body>
         <x-select>
-            <div Select__delegate>Delegate</div>
+            <div class='delegate' Select__delegate>Delegate</div>
 
             <template Select__model>
                 <script>
@@ -32,5 +52,7 @@
                 </script>
             </template>
         </x-select>
+
+        <div>DivDivDivDivDivDivDivDivDivDivDivDivDivDivDivDivDivDivDivDivDivDivDivDiv</div>
     </body>
 </html>

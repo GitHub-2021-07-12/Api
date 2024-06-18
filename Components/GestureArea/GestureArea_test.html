@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta content='initial-scale=1, user-scalable=no, width=device-width' name='viewport'>
+        <title>GestureArea</title>
+
+        <style>
+            * {
+                &:not(:defined) {
+                    display: none;
+                }
+
+
+                &[_building] {
+                    display: none;
+                }
+            }
+
+
+            body {
+                -webkit-user-select: none;
+                box-sizing: border-box;
+                display: grid;
+                gap: 10px;
+                grid-template-columns: 1fr 1fr;
+                height: 100dvh;
+                margin: 0;
+                padding: 10px;
+                touch-action: none;
+                user-select: none;
+            }
+
+            x-gestureArea {
+                border: 1px solid #000;
+                display: block;
+                padding: 100px;
+                /* touch-action: none; */
+            }
+
+
+            .log {
+                background: #eee;
+                border: 1px solid #000;
+                overflow: auto;
+                overflow-wrap: anywhere;
+                padding: 10px;
+                white-space: pre-wrap;
+            }
+        </style>
+
+        <script type='module'>
+            let {GestureArea} = await import('./GestureArea.js');
+            await GestureArea._defined;
+
+
+            window.gestureAreas = document.querySelectorAll('x-gestureArea');
+            await Promise.all([...gestureAreas].map((item) => item._built));
+
+            window.log = document.querySelector('.log');
+
+            log.ondblclick = () => log.textContent = '';
+            log.log = (...args) => {
+                log.textContent += args.join('  ') + '\n';
+                log.scrollTop = log.scrollHeight;
+            };
+            log.addEventListener('touchstart', (event) => event.preventDefault(), false);
+            gestureAreas[0].addEventListener('touchstart', (event) => event.preventDefault(), false);
+        </script>
+    </head>
+
+    <body>
+        <x-gestureArea>
+            <x-gestureArea></x-gestureArea>
+        </x-gestureArea>
+        <div class='log'></div>
+    </body>
+</html>

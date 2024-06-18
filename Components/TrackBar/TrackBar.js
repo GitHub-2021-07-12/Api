@@ -13,6 +13,7 @@ export class TrackBar extends Component {
     static _attributes = {
         ...super._attributes,
 
+        disabled: false,
         gain: {
             default: 1,
             range: [0, Infinity],
@@ -57,11 +58,21 @@ export class TrackBar extends Component {
     _track_length = 0;
 
 
+    get disabled() {
+        return this._attributes.disabled;
+    }
+    set disabled(disabled) {
+        this._attribute__set('disabled', disabled);
+
+        this._elements.puck.disabled = this.disabled;
+    }
+
     get gain() {
         return this._attributes.gain;
     }
     set gain(gain) {
         this._attribute__set('gain', gain);
+
         this._elements.puck.gain = gain;
     }
 
@@ -70,6 +81,7 @@ export class TrackBar extends Component {
     }
     set shift(shift) {
         this._attribute__set('shift', shift);
+
         this._elements.puck.shift = shift;
     }
 
@@ -78,6 +90,7 @@ export class TrackBar extends Component {
     }
     set shift_jump(shift_jump) {
         this._attribute__set('shift_jump', shift_jump);
+
         this._elements.puck.shift_jump = shift_jump;
     }
 
@@ -131,6 +144,7 @@ export class TrackBar extends Component {
         }
         else {
             this._attribute__set('value_min', 0);
+
             this.value_max = freeSpace_length;
         }
     }
@@ -140,6 +154,7 @@ export class TrackBar extends Component {
     }
     set vertical(vertical) {
         this._attribute__set('vertical', vertical);
+
         this._elements.puck.axis = this.vertical ? 'y' : 'x';
         this._puck_position__define();
     }

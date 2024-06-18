@@ -8,31 +8,21 @@
         <title>Flickable</title>
 
         <style>
-            /* :not(:defined) { */
-            /*     display: none; */
-            /* } */
+            * {
+                &:not(:defined) {
+                    display: none;
+                }
 
-            :root {
-                background: #0002;
+
+                &[_building] {
+                    display: none;
+                }
             }
+
 
             body {
                 margin: 0;
             }
-
-            #root {
-                -webkit-user-select: none;
-                border: 1px solid #000;
-                box-sizing: border-box;
-                display: grid;
-                gap: 10px;
-                grid-template: 100% / 1fr 1fr;
-                height: 100dvh;
-                padding: 10px;
-                touch-action: none;
-                user-select: none;
-            }
-
 
             textArea {
                 background: transparent;
@@ -64,6 +54,20 @@
                     background: red;
                 }
             }
+
+
+            #root {
+                -webkit-user-select: none;
+                border: 1px solid #000;
+                box-sizing: border-box;
+                display: grid;
+                gap: 10px;
+                grid-template: 100% / 1fr 1fr;
+                height: 100dvh;
+                padding: 10px;
+                touch-action: none;
+                user-select: none;
+            }
         </style>
 
         <script type='module'>
@@ -83,21 +87,24 @@
             await Flickable._defined;
             await Promise.all([...flickables].map((item) => item._built));
 
-            document.body.hidden = false;
-
             textArea.value = Array(100).join(flickables[1].textContent);
             flickables[0].refresh();
             flickables[1].textContent = Array(100).join(flickables[1].textContent);
             flickables[1].refresh();
+
+            flickables[0].eventListeners__add({
+                press: (event) => console.log(event),
+                tap: (event) => console.log(event),
+            });
         </script>
     </head>
 
-    <body hidden>
+    <body>
         <div id='root'>
-            <x-flickable disabled>
-                <textArea slot='display' spellCheck='false'></textArea>
+            <x-flickable shift='50' disabled_ swipe_disabled tap_disabled_>
+                <textArea slot='display' spellCheck='false' disabled_ readOnly_></textArea>
             </x-flickable>
-            <x-flickable>
+            <x-flickable disabled>
                 abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
             </x-flickable>
         </div>

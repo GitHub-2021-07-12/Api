@@ -6,8 +6,6 @@
         <meta name='viewport' content='width=device-width, user-scalable=no'>
         <title>Draggable</title>
 
-        <script type='module' src='./Draggable.js'></script>
-
         <style>
             body {
                 /* -webkit-user-select: none; */
@@ -41,7 +39,8 @@
                 -webkit-user-select: none;
                 box-sizing: border-box;
                 height: 100dvh;
-                padding: 10px;
+                padding: 20px;
+                position: relative;
                 touch-action: none;
                 user-select: none;
             }
@@ -75,34 +74,54 @@
         </style>
 
         <script type='module'>
-            // stick__puck.addEventListener('dblclick', () => {
-            //     stick__puck.position = stick__puck._position_initial;
-            // });
-            // stick__puck.addEventListener('drag', () => {
-            //     stick__puck.textContent = `${stick__puck._pointer_delta.x}, ${stick__puck._pointer_delta.y}`;
-            // });
+            let {Draggable} = await import('./Draggable.js');
+            await Draggable._defined;
 
-            window.addEventListener('error', (event) => {
-                alert(event.filename + ' ' + event.message + ' ' + event.lineno);
+            window.draggables = document.querySelectorAll('x-draggable');
+            await Promise.all([...draggables].map((item) => item._built));
+
+
+            draggables[0].eventListeners__add({
+                tap: (event) => {
+                    console.log(event)
+                },
+            });
+            draggables[1].eventListeners__add({
+                press: (event) => {
+                    console.log(event)
+                },
+                tap: (event) => {
+                    console.log(event)
+                },
             });
 
-            let root = document.querySelector('#root');
-            root.addEventListener('touchstart', (event) => event.preventDefault());
+
+            // window.addEventListener('error', (event) => {
+            //     alert(event.filename + ' ' + event.message + ' ' + event.lineno);
+            // });
+
+            // let root = document.querySelector('#root');
+            // root.addEventListener('touchstart', (event) => event.preventDefault());
         </script>
     </head>
 
     <body>
         <div id='root'>
-            <x-draggable id='stick'>
+            <x-draggable id='stick' axis='y' shift='50' tap_disabled_>
                 <x-draggable
                     id='stick__puck'
 
+                    axis='x'
                     gain_='0.5'
-                    radius='100'
+                    radius_='100'
                     shift='20'
                     shift_jump
+                    swipe_disabled_
+                    tap_disabled_
                     unbounded
                 ></x-draggable>
+
+                <div id='stick__puck'></div>
             </x-draggable>
 
             <div id='stick'>

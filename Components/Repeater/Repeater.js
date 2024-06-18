@@ -119,8 +119,6 @@ export class Repeater extends Component {
         if (this.model instanceof Model) {
             this.model.eventListeners__add(this._model_eventListeners);
         }
-
-        this.refresh();
     }
 
     get target() {
@@ -149,8 +147,6 @@ export class Repeater extends Component {
                 this._attribute__set('target');
             }
         }
-
-        this.refresh();
     }
 
 

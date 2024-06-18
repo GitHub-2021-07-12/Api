@@ -10,6 +10,7 @@ export class Edit extends Component {
 
         _focused: false,
         _invalid: false,
+        _notEmpty: false,
 
         button_clear: false,
         button_mask: false,
@@ -73,6 +74,13 @@ export class Edit extends Component {
     }
     set _invalid(invalid) {
         this._attribute__set('_invalid', invalid);
+    }
+
+    get _notEmpty() {
+        return this._attributes._notEmpty;
+    }
+    set _notEmpty(notEmpty) {
+        this._attribute__set('_notEmpty', notEmpty);
     }
 
 
@@ -177,10 +185,12 @@ export class Edit extends Component {
         return this._value;
     }
     set value(value) {
-        this._invalid = false;
         this._value = value + '';
         this._chars = this._string_chars__get(this._value);
         this._elements.input.value = this.masked ? this._value_masked__get() : this._value;
+
+        this._invalid = false;
+        this._notEmpty = !!this._value;
     }
 
 
@@ -188,7 +198,6 @@ export class Edit extends Component {
         event.preventDefault();
 
         this.value = '';
-        // requestAnimationFrame(() => this.focus());
     }
 
     _button_mask__on_pointerDown(event) {
@@ -223,8 +232,6 @@ export class Edit extends Component {
     }
 
     _input__on_beforeInput(event) {
-        // console.log('beforeinput')
-
         if (event.inputType == 'insertCompositionText' || event.inputType.startsWith('history')) {
             event.preventDefault();
 
@@ -242,16 +249,12 @@ export class Edit extends Component {
     }
 
     _input__on_compositionEnd(event) {
-        // console.log('compositionend', event.data)
-
         if (!event.data) return;
 
         this._value__change(event.data, event.inputType);
     }
 
     _input__on_compositionStart() {
-        // console.log('compositionstart')
-
         this._input_value = this._elements.input.value;
         this._selection_begin = this._elements.input.selectionStart;
         this._selection_end = this._elements.input.selectionEnd;
@@ -282,8 +285,6 @@ export class Edit extends Component {
     }
 
     _input__on_input(event) {
-        // console.log('input', event.data, event.inputType)
-
         if (event.inputType == 'insertCompositionText') return;
 
         this._value__change(this._event_data, event.inputType);
@@ -322,23 +323,9 @@ export class Edit extends Component {
         }
 
         chars_left.push(...this._string_chars__get(data));
-        this._chars = [...chars_left, ...chars_right];
-        this._value = this._chars.slice(0, this.length_max).join('');
-
-        if (this.masked) {
-            this._elements.input.value = this._value_masked__get();
-            this._elements.input.selectionStart = chars_left.length * this.mask_char.length;
-        }
-        else {
-            this._elements.input.value = this._value;
-            this._elements.input.selectionStart = chars_left.join('').length;
-        }
-
+        this.value = [...chars_left, ...chars_right].slice(0, this.length_max).join('');
+        this._elements.input.selectionStart = this.masked ? chars_left.length * this.mask_char.length : chars_left.join('').length;
         this._elements.input.selectionEnd = this._elements.input.selectionStart;
-
-        this._invalid = false;
-
-        // console.log(this._value, this._chars, data, inputType)
     }
 
     _value_masked__get() {
