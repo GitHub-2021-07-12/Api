@@ -1,13 +1,13 @@
 // 19.03.2024
 
 
-import {SwipeArea} from '../SwipeArea/SwipeArea.js';
+import {GestureArea} from '../GestureArea/GestureArea.js';
 
 import {Common} from '../../Units/Common/Common.js';
 import {Renderer} from '../../Units/Renderer/Renderer.js';
 
 
-export class Leafable extends SwipeArea {
+export class Leafable extends GestureArea {
     static _attributes = {
         ...super._attributes,
 
@@ -30,10 +30,6 @@ export class Leafable extends SwipeArea {
             range: [0, 1],
         },
         elastic: false,
-        gain: {
-            default: 1,
-            range: [0, Infinity],
-        },
         index: {
             default: 0,
             persistent: true,
@@ -58,7 +54,7 @@ export class Leafable extends SwipeArea {
     static url = import.meta.url;
 
     static shadow_opts = {
-        ...SwipeArea.shadow_opts,
+        ...super.shadow_opts,
 
         slotAssignment: 'manual',
     };
@@ -272,13 +268,7 @@ export class Leafable extends SwipeArea {
         }
     }
 
-    _on_capture(event) {
-        if (!this.children.length) {
-            event.preventDefault();
-
-            return;
-        }
-
+    _on_capture() {
         if (!this._animations) return;
 
         this._delta = this._animations_progress * this._size * this._animations_direction / this.gain;
@@ -333,7 +323,13 @@ export class Leafable extends SwipeArea {
         this._animations_progress__set(delta / this._size * this._animations_direction * this.gain);
     }
 
-    _on_swipe_begin() {
+    _on_swipe_begin(event) {
+        if (!this.children.length) {
+            event.preventDefault();
+
+            return;
+        }
+
         this._size = this.vertical ? this.height_inner__get() : this.width_inner__get();
     }
 

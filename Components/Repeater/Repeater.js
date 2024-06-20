@@ -132,20 +132,17 @@ export class Repeater extends Component {
             this._attribute__set('target');
         }
         else {
+            let target_selector = target;
+
             try {
-                this._target = this.parentElement.querySelector(target);
+                target = this.parentElement.querySelector(target_selector);
             }
             catch {
-                this._target = null;
+                target = null;
             }
 
-            if (this._target) {
-                this._attribute__set('target', target);
-            }
-            else {
-                this._target = this;
-                this._attribute__set('target');
-            }
+            this._target = target || this;
+            this._attribute__set('target', target && target_selector);
         }
     }
 

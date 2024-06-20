@@ -56,6 +56,7 @@ export class GestureArea extends Component {
 
 
     _pointers = new Map();
+    _taps_count = 0;
 
 
     get _swipe() {
@@ -71,7 +72,6 @@ export class GestureArea extends Component {
     }
     set disabled(disabled) {
         this._attribute__set('disabled', disabled);
-
         this._pointers__release();
     }
 
@@ -108,7 +108,6 @@ export class GestureArea extends Component {
     }
     set swipe_disabled(swipe_disabled) {
         this._attribute__set('swipe_disabled', swipe_disabled);
-
         this._pointers__release();
     }
 
@@ -117,7 +116,6 @@ export class GestureArea extends Component {
     }
     set tap_disabled(tap_disabled) {
         this._attribute__set('tap_disabled', tap_disabled);
-
         this._pointers__release();
     }
 
@@ -157,6 +155,7 @@ export class GestureArea extends Component {
         this._press__cancel(pointer);
         this._swipe_end__dispatch(pointer);
         this._tap__dispatch(pointer, event.timeStamp);
+        this.event__dispatch('release', {pointer});
 
         if (!this._pointers.size) {
             this.removeEventListener('pointermove', this._on_pointerMove);
@@ -173,6 +172,7 @@ export class GestureArea extends Component {
         let pointer = this._pointer__add(event);
         this._pointer__capture(pointer, event);
         this._press__init(pointer);
+        this.event__dispatch('capture', {pointer});
     }
 
     _on_pointerMove(event) {
@@ -259,8 +259,8 @@ export class GestureArea extends Component {
     _swipe_begin__dispatch(pointer) {
         if (this.swipe_disabled || pointer.swipe || !pointer.shifted) return;
 
-        this._swipe = true;
         pointer.swipe = this.event__dispatch('swipe_begin', {_pointer: pointer});
+        this._swipe ||= pointer.swipe;
     }
 
     _swipe_end__dispatch(pointer) {

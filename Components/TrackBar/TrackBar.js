@@ -63,7 +63,6 @@ export class TrackBar extends Component {
     }
     set disabled(disabled) {
         this._attribute__set('disabled', disabled);
-
         this._elements.puck.disabled = this.disabled;
     }
 
@@ -72,8 +71,7 @@ export class TrackBar extends Component {
     }
     set gain(gain) {
         this._attribute__set('gain', gain);
-
-        this._elements.puck.gain = gain;
+        this._elements.puck.gain = this.gain;
     }
 
     get shift() {
@@ -81,8 +79,7 @@ export class TrackBar extends Component {
     }
     set shift(shift) {
         this._attribute__set('shift', shift);
-
-        this._elements.puck.shift = shift;
+        this._elements.puck.shift = this.shift;
     }
 
     get shift_jump() {
@@ -90,8 +87,7 @@ export class TrackBar extends Component {
     }
     set shift_jump(shift_jump) {
         this._attribute__set('shift_jump', shift_jump);
-
-        this._elements.puck.shift_jump = shift_jump;
+        this._elements.puck.shift_jump = this.shift_jump;
     }
 
     get value() {
@@ -100,7 +96,6 @@ export class TrackBar extends Component {
     set value(value) {
         value = Common.to_range(Math.round(value), this.value_min, this.value_max);
         this._attribute__set('value', value);
-
         this._puck_position__define();
     }
 
@@ -143,9 +138,8 @@ export class TrackBar extends Component {
             this.value = this.value;
         }
         else {
-            this._attribute__set('value_min', 0);
-
             this.value_max = freeSpace_length;
+            this._attribute__set('value_min', 0);
         }
     }
 
@@ -154,7 +148,6 @@ export class TrackBar extends Component {
     }
     set vertical(vertical) {
         this._attribute__set('vertical', vertical);
-
         this._elements.puck.axis = this.vertical ? 'y' : 'x';
         this._puck_position__define();
     }

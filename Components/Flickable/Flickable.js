@@ -130,7 +130,6 @@ export class Flickable extends GestureArea {
     }
     set disabled(disabled) {
         this._attribute__set('disabled', disabled);
-
         this._elements.scrollBar_x.disabled = this.disabled;
         this._elements.scrollBar_y.disabled = this.disabled;
         this._pointers__release();
@@ -141,9 +140,8 @@ export class Flickable extends GestureArea {
     }
     set gain(gain) {
         this._attribute__set('gain', gain);
-
-        this._elements.scrollBar_x.gain = gain;
-        this._elements.scrollBar_y.gain = gain;
+        this._elements.scrollBar_x.gain = this.gain;
+        this._elements.scrollBar_y.gain = this.gain;
     }
 
     get jerk() {
@@ -172,7 +170,6 @@ export class Flickable extends GestureArea {
     }
     set scrollBars(scrollBars) {
         this._attribute__set('scrollBars', scrollBars);
-
         this.refresh();
     }
 
@@ -188,9 +185,8 @@ export class Flickable extends GestureArea {
     }
     set shift(shift) {
         this._attribute__set('shift', shift);
-
-        this._elements.scrollBar_x.shift = shift;
-        this._elements.scrollBar_y.shift = shift;
+        this._elements.scrollBar_x.shift = this.shift;
+        this._elements.scrollBar_y.shift = this.shift;
     }
 
     get shift_jump() {
@@ -198,9 +194,8 @@ export class Flickable extends GestureArea {
     }
     set shift_jump(shift_jump) {
         this._attribute__set('shift_jump', shift_jump);
-
-        this._elements.scrollBar_x.shift_jump = shift_jump;
-        this._elements.scrollBar_y.shift_jump = shift_jump;
+        this._elements.scrollBar_x.shift_jump = this.shift_jump;
+        this._elements.scrollBar_y.shift_jump = this.shift_jump;
     }
 
     get snag() {
