@@ -189,7 +189,7 @@ export class Draggable extends GestureArea {
     }
 
     _on_swipe(event) {
-        this._drag__make(event.detail._pointer.position_delta);
+        this._drag__make(event.detail.pointer.position_delta);
     }
 
     _on_swipe_begin(event) {

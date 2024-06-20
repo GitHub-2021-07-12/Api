@@ -277,7 +277,7 @@ export class Leafable extends GestureArea {
     }
 
     _on_flick(event) {
-        let pointer = event.detail._pointer;
+        let pointer = event.detail.pointer;
         let velocity = this.vertical ? pointer.velocity.y : pointer.velocity.x;
         let velocity_abs = Math.abs(velocity);
 
@@ -308,7 +308,7 @@ export class Leafable extends GestureArea {
     }
 
     _on_swipe(event) {
-        let pointer = event.detail._pointer;
+        let pointer = event.detail.pointer;
         let delta = this._delta + (this.vertical ? pointer.position_delta.y : pointer.position_delta.x);
         let animation_direction = Math.sign(delta || 1);
 

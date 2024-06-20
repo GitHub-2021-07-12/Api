@@ -53,6 +53,10 @@
                 &::part(puck) {
                     background: red;
                 }
+
+                &[_swipe] {
+                    background: #0f02;
+                }
             }
 
 
@@ -93,8 +97,8 @@
             flickables[1].refresh();
 
             flickables[0].eventListeners__add({
-                press: (event) => console.log(event),
-                tap: (event) => console.log(event),
+                press: (event) => console.log(event, event.detail.taps_count),
+                tap: (event) => console.log(event, event.detail.taps_count),
             });
         </script>
     </head>
@@ -104,7 +108,7 @@
             <x-flickable shift='50' disabled_ swipe_disabled tap_disabled_>
                 <textArea slot='display' spellCheck='false' disabled_ readOnly_></textArea>
             </x-flickable>
-            <x-flickable disabled>
+            <x-flickable>
                 abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
             </x-flickable>
         </div>

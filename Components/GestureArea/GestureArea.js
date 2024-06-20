@@ -36,6 +36,10 @@ export class GestureArea extends Component {
             default: 1,
             range: [0, Infinity],
         },
+        press_time: {
+            default: 800,
+            range: [1, Infinity],
+        },
         shift: {
             default: 1,
             range: [1, Infinity],
@@ -43,8 +47,8 @@ export class GestureArea extends Component {
         shift_jump: false,
         swipe_disabled: false,
         tap_disabled: false,
-        tap_time: {
-            default: 800,
+        taps_interval: {
+            default: 400,
             range: [1, Infinity],
         },
     };
@@ -56,6 +60,8 @@ export class GestureArea extends Component {
 
 
     _pointers = new Map();
+    _tap_prev_position = new Vector_2d();
+    _tap_prev_timeStamp = 0;
     _taps_count = 0;
 
 
@@ -89,6 +95,13 @@ export class GestureArea extends Component {
         this._attribute__set('gain', gain);
     }
 
+    get press_time() {
+        return this._attributes.press_time;
+    }
+    set press_time(press_time) {
+        this._attribute__set('press_time', press_time);
+    }
+
     get shift() {
         return this._attributes.shift;
     }
@@ -119,11 +132,11 @@ export class GestureArea extends Component {
         this._pointers__release();
     }
 
-    get tap_time() {
-        return this._attributes.tap_time;
+    get taps_interval() {
+        return this._attributes.taps_interval;
     }
-    set tap_time(tap_time) {
-        this._attribute__set('tap_time', tap_time);
+    set taps_interval(taps_interval) {
+        this._attribute__set('taps_interval', taps_interval);
     }
 
 
@@ -137,7 +150,7 @@ export class GestureArea extends Component {
     _flick__dispatch(pointer, timeStamp) {
         if (this.swipe_disabled || !pointer.swipe || timeStamp - pointer.timeStamp > this.flickTime_max) return;
 
-        this.event__dispatch('flick', {_pointer: pointer});
+        this.event__dispatch('flick', {pointer});
     }
 
     _init() {
@@ -186,7 +199,7 @@ export class GestureArea extends Component {
 
     _pointer__add(event) {
         let pointer = new this.constructor._Pointer();
-        pointer.event_press_time = this.tap_time;
+        pointer.event_press_time = this.press_time;
         pointer.id = event.pointerId;
         pointer.is_primary = event.isPrimary;
         pointer.target = event.target;
@@ -241,25 +254,26 @@ export class GestureArea extends Component {
     _press__dispatch(pointer) {
         if (pointer.shifted || !this.contains(document.elementFromPoint(pointer.position.x, pointer.position.y))) return;
 
-        this.event__dispatch('press', {_pointer: pointer});
+        this._taps_count__update(pointer);
+        this.event__dispatch('press', {pointer, taps_count: this._taps_count});
     }
 
     _press__init(pointer) {
         if (this.tap_disabled) return;
 
-        pointer.press_timeout_id = setTimeout(() => this._press__dispatch(pointer), this.tap_time);
+        pointer.press_timeout_id = setTimeout(() => this._press__dispatch(pointer), this.press_time);
     }
 
     _swipe__dispatch(pointer) {
         if (this.swipe_disabled || !pointer.swipe) return;
 
-        this.event__dispatch('swipe', {_pointer: pointer});
+        this.event__dispatch('swipe', {pointer});
     }
 
     _swipe_begin__dispatch(pointer) {
         if (this.swipe_disabled || pointer.swipe || !pointer.shifted) return;
 
-        pointer.swipe = this.event__dispatch('swipe_begin', {_pointer: pointer});
+        pointer.swipe = this.event__dispatch('swipe_begin', {pointer});
         this._swipe ||= pointer.swipe;
     }
 
@@ -267,18 +281,34 @@ export class GestureArea extends Component {
         if (this.swipe_disabled || !pointer.swipe) return;
 
         this._swipe = !!this._pointers.size;
-        this.event__dispatch('swipe_end', {_pointer: pointer});
+        this.event__dispatch('swipe_end', {pointer});
     }
 
     _tap__dispatch(pointer, timeStamp) {
         if (
             this.tap_disabled
             || pointer.shifted
-            || timeStamp - pointer.timeStamp_initial > this.tap_time
+            || timeStamp - pointer.timeStamp_initial > this.press_time
             || !this.contains(document.elementFromPoint(pointer.position.x, pointer.position.y))
         ) return;
 
-        this.event__dispatch('tap', {_pointer: pointer});
+        this._taps_count__update(pointer);
+        this.event__dispatch('tap', {pointer, taps_count: this._taps_count});
+    }
+
+    _taps_count__update(pointer) {
+        if (
+            pointer.timeStamp_initial - this._tap_prev_timeStamp <= this.taps_interval
+            && this._tap_prev_position.sub(pointer.position).length <= this.shift
+        ) {
+            this._taps_count++;
+        }
+        else {
+            this._taps_count = 1;
+        }
+
+        this._tap_prev_timeStamp = pointer.timeStamp_initial;
+        this._tap_prev_position.set_vector(pointer.position);
     }
 
 

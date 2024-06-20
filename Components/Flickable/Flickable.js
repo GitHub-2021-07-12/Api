@@ -249,7 +249,7 @@ export class Flickable extends GestureArea {
     }
 
     _on_flick(event) {
-        this._velocity.set_vector(event.detail._pointer.velocity).length__to_range(-this.velocity_max, this.velocity_max);
+        this._velocity.set_vector(event.detail.pointer.velocity).length__to_range(-this.velocity_max, this.velocity_max);
         this._acceleration.set_vector(this._velocity).invert().length__set(this.acceleration);
         this._jerk.set_vector(this._velocity).invert().length__set(this.jerk);
 
@@ -263,13 +263,13 @@ export class Flickable extends GestureArea {
     }
 
     _on_swipe(event) {
-        let pointer = event.detail._pointer;
+        let pointer = event.detail.pointer;
         this.scroll_x = this._scroll_x_initial - pointer.position_delta.x;
         this.scroll_y = this._scroll_y_initial - pointer.position_delta.y;
     }
 
     _on_swipe_begin(event) {
-        let target = event.detail._pointer.target;
+        let target = event.detail.pointer.target;
 
         if (target instanceof TrackBar || this._snag__check(target)) {
             event.preventDefault();
