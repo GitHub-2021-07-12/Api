@@ -12,10 +12,40 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     static _defined = null;
     static _dom = null;
     static _elements = {};
+    static _slots = [];
     static _tag = '';
 
     static _attributes = {
         _building: false,
+    };
+
+    static _eventListeners = {
+        elements: {
+            scrollBar_x: {
+                change: '_scrollBar_x__on_value_change',
+            },
+            scrollBar_y: {
+                change: '_scrollBar_y__on_value_change',
+            },
+        },
+        shadow: {
+
+        },
+        slots: {
+            display: {
+                scroll: '_display__on_scroll',
+                wheel: '_display__on_wheel',
+            },
+        },
+        this: {
+            ...super._eventListeners?.this,
+
+            capture: '_on_capture',
+            flick: '_on_flick',
+            swipe: function (event) {},
+            swipe_start: ['_on_swipe_start', {passive: false}],
+            swipe_stop: [this.prototype._on_swipe_stop, false],
+        },
     };
 
 
@@ -399,6 +429,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     _attributes_observing = false;
     _built = new ExternalPromise();
     _elements = {};
+    _eventListeners = {};
     _slots = {};
     _shadow = null;
 
@@ -420,10 +451,9 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
     _attribute__set(attribute_name, attribute_value = null) {
         let attribute_descriptor = this.constructor._attributes[attribute_name];
-
         let attribute_value_default = attribute_descriptor instanceof Object ? attribute_descriptor.default : attribute_descriptor;
 
-        if (attribute_value == null) {
+        if (attribute_value == null || attribute_value instanceof Object) {
             attribute_value = attribute_value_default;
         }
         else {
@@ -521,13 +551,14 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     _init() {}
 
     _slots__define() {
-        let slots = this._shadow.querySelectorAll('slot');
         this._slots = {};
 
-        for (let slot of slots) {
-            let elements_assigned = slot.assignedElements();
-            let elements = elements_assigned.length ? elements_assigned : slot.children;
-            this._slots[slot.name] = elements.length > 1 ? elements : elements[0];
+        for (let slot of this.constructor._slots.values()) {
+            let slot_name = slot;
+            slot = this._shadow.querySelector(`slot[name="${slot_name}"]`);
+            let elements = slot.assignedElements();
+            elements = elements.length ? elements : slot.children;
+            this._slots[slot_name] = elements.length > 1 ? elements : elements[0];
         }
     }
 

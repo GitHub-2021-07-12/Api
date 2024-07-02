@@ -35,8 +35,8 @@ export class Model extends EventManager {
         return !!this.filter_regExp.test(item[this.filter_prop]);
     }
 
-    _items_indexes__define(index_begin = 0) {
-        for (let i = index_begin; i < this._items.length; i++) {
+    _items_indexes__define(index_first = 0) {
+        for (let i = index_first; i < this._items.length; i++) {
             this._items[i]._index = i;
         }
     }

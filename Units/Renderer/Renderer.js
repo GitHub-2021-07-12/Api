@@ -12,7 +12,7 @@ export class Renderer {
 
     _render() {
         let timeStamp = performance.now();
-        this._dt = timeStamp - this._timeStamp;
+        this._dt = (timeStamp - this._timeStamp) / 1e3;
         this._timeStamp = timeStamp;
 
         this.render(this);

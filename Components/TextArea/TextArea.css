@@ -10,8 +10,8 @@
         --TextArea__placeholder_color: currentColor;
         --TextArea__placeholder_opacity: 0.4;
 
-        border-radius: 2px;
         border: 1px solid #888;
+        border-radius: 2px;
         display: block;
         font-family: 'Arial';
         line-height: 1.5;
@@ -49,7 +49,7 @@
             opacity: var(--TextArea__placeholder_opacity);
         }
 
-        .flickable[_scroll_y] & {
+        .flickable[_scroll_height] & {
             margin-right: 0 !important;
             padding-right: 0 !important;
         }

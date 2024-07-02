@@ -7,6 +7,7 @@
         --_Flickable__scrollBar_phantom__margin: calc(-1 * var(--Flickable__scrollBar__width));
 
 
+        --Flickable__display__height_max: unset;
         --Flickable__gap: 0px;
         --Flickable__puck__length_min: 20%;
         --Flickable__puck__margin_inner: 2px;
@@ -19,6 +20,7 @@
 
     slot[name='display'] {
         &::slotted(*) {
+            max-height: var(--Flickable__display__height_max);
             overflow: auto !important;
             scrollbar-width: none !important;
             touch-action: none !important;
@@ -34,13 +36,10 @@
     }
 
 
-    .content {
-        box-sizing: border-box !important;
-        display: inline-block;
-    }
-
     .display {
+        box-sizing: border-box;
         display: block !important;
+        max-height: var(--Flickable__display__height_max);
         overflow: auto !important;
         scrollbar-width: none !important;
         touch-action: none !important;
@@ -58,16 +57,15 @@
         display: grid;
         gap: var(--Flickable__gap);
         height: 100%;
-        width: 100%;
 
         :host(:not([scrollBars='hidden'])) & {
-            :host([_scroll_x]) & {
-                grid-template: auto min-content / auto;
-            }
-            :host([_scroll_y]) & {
+            :host([_scroll_height]) & {
                 grid-template: auto / auto min-content;
             }
-            :host([_scroll_x][_scroll_y]) & {
+            :host([_scroll_width]) & {
+                grid-template: auto min-content / auto;
+            }
+            :host([_scroll_height][_scroll_width]) & {
                 grid-template: auto min-content / auto min-content;
             }
         }
@@ -86,6 +84,10 @@
         &::part(handle) {
             pointer-events: initial !important;
         }
+
+        &[disabled] {
+            background: gray;
+        }
     }
 
     .scrollBar_x {
@@ -99,11 +101,11 @@
         :host([scrollBars='phantom']) & {
             margin-top: var(--_Flickable__scrollBar_phantom__margin) !important;
 
-            :host([_scroll_y]) & {
+            :host([_scroll_height]) & {
                 margin-right: var(--TrackBar__width) !important;
             }
         }
-        :host([_scroll_x]:not([scrollBars='hidden'])) & {
+        :host([_scroll_width]:not([scrollBars='hidden'])) & {
             display: block !important;
         }
     }
@@ -119,11 +121,11 @@
         :host([scrollBars='phantom']) & {
             margin-left: var(--_Flickable__scrollBar_phantom__margin) !important;
 
-            :host([_scroll_x]) & {
+            :host([_scroll_width]) & {
                 margin-bottom: var(--TrackBar__width) !important;
             }
         }
-        :host([_scroll_y]:not([scrollBars='hidden'])) & {
+        :host([_scroll_height]:not([scrollBars='hidden'])) & {
             display: block !important;
         }
     }

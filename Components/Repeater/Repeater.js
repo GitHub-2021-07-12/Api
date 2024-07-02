@@ -220,7 +220,6 @@ export class Repeater extends Component {
 
         this._items__init(items);
         this._items_indexes__apply();
-
         this.event__dispatch('add', {items});
     }
 
@@ -271,7 +270,6 @@ export class Repeater extends Component {
         await this._items__await(items);
 
         this._items__init(items);
-
         this.event__dispatch('define', {items});
     }
 
@@ -290,7 +288,6 @@ export class Repeater extends Component {
         }
 
         this._items_indexes__apply();
-
         this.event__dispatch('delete');
     }
 
@@ -314,7 +311,6 @@ export class Repeater extends Component {
         this.target.append(...items);
 
         this._items_indexes__apply();
-
         this.event__dispatch('order');
     }
 
@@ -366,7 +362,7 @@ export class Repeater extends Component {
     }
 
 
-    refresh() {
-        this._items__define();
+    async refresh() {
+        await this._items__define();
     }
 }

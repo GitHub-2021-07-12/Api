@@ -109,6 +109,6 @@
         grid-auto-columns: auto min-content min-content;
         grid-auto-flow: column;
         height: 100%;
-        width: 100%;
+        /* width: 100%; */
     }
 }

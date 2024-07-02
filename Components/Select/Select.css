@@ -12,43 +12,51 @@
     }
 
     .flickable {
-        border: 1px solid #888;
-        border-radius: 2px;
-        height: 100px;
-        padding: 10px;
-
-        /* position: absolute; */
+        /* border: 1px solid #888; */
+        /* border-radius: 2px; */
+        /* height: 100%; */
+        /* padding: 10px; */
+        /* min-height: 0px; */
+        /* max-height: 100px; */
+        /* height: 1000px; */
         /* position: relative; */
-        /* inset: 0; */
-        /* top: 100%; */
-        /* top: 40px; */
-        /* width: 100%; */
-        /* box-sizing: border-box; */
-        /* display: unset; */
-        /* z-index: 1; */
+        /* --Flickable__display__height_max: 100px; */
+
+        &::part(display) {
+            max-height: 100px;
+            padding: 8px;
+        }
     }
 
-    .list {
-        border: none;
-        /* display: block; */
+    .popup {
+        /* box-sizing: border-box; */
+        /* inset: 0; */
+        /* left: 0px; */
+        /* height: auto; */
+        /* max-height: 100px; */
+        /* position: absolute; */
+        /* right: 0px; */
+        /* top: 100%; */
+        /* width: 100%; */
+        background: #faa;
+        border: 1px solid #888;
+        border-radius: 2px;
+        display: block;
+        margin: 0;
         padding: 0;
-        width: 100%;
+        width: auto !important;
+        z-index: 1;
 
         :host([open]) & {
             display: block;
         }
     }
 
+    /* .repeater { */
+    /*     display: none; */
+    /* } */
+
     .root {
         display: contents;
-        /* position: relative; */
-    }
-
-
-    [popover] {
-        /* position: absolute; */
-        inset: unset;
-        /* width: 100%; */
-        box-sizing: border-box;
     }
 }

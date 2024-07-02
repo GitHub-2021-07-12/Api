@@ -8,24 +8,61 @@ import {Vector_2d} from '../../Units/Vector_2d/Vector_2d.js';
 
 export class GestureArea extends Component {
     static _Pointer = class {
+        static points_count_max = 4;
+
+
+        _points = [];
+        _velocity = new Vector_2d();
+
+
         id = 0;
-        is_primary = false;
+        movement = new Vector_2d();
         position = new Vector_2d();
         position_delta = new Vector_2d();
         position_initial = new Vector_2d();
+        position_inner = new Vector_2d();
+        position_inner_initial = new Vector_2d();
         press_timeout_id = 0;
         shifted = false;
         swipe = false;
         target = null;
         timeStamp = 0;
         timeStamp_initial = 0;
-        velocity = new Vector_2d();
+
+
+        capture() {
+            this.target?.setPointerCapture(this.id);
+        }
+
+        points__update() {
+            let point = {
+                position: this.position.clone(),
+                timeStamp: this.timeStamp,
+            };
+            this._points.push(point);
+
+            if (this._points.length > this.constructor.points_count_max) {
+                this._points.shift();
+            }
+        }
+
+        release() {
+            this.target?.releasePointerCapture(this.id);
+        }
+
+        velocity__define() {
+            let point_first = this._points[0];
+            let point_last = this._points.at(-1);
+            let dt = (point_last?.timeStamp - point_first?.timeStamp) / 1e3;
+
+            if (!dt) return;
+
+            this._velocity.set_vector(point_last.position).sub(point_first.position).divide(dt);
+        }
     };
 
     static _attributes = {
         ...super._attributes,
-
-        _swipe: false,
 
         disabled: false,
         flickTime_max: {
@@ -60,17 +97,10 @@ export class GestureArea extends Component {
 
 
     _pointers = new Map();
-    _tap_prev_position = new Vector_2d();
+    _tap_first_position = null;
     _tap_prev_timeStamp = 0;
     _taps_count = 0;
-
-
-    get _swipe() {
-        return this._attributes._swipe;
-    }
-    set _swipe(swipe) {
-        this._attribute__set('_swipe', swipe);
-    }
+    _timeStamp = 0;
 
 
     get disabled() {
@@ -78,7 +108,6 @@ export class GestureArea extends Component {
     }
     set disabled(disabled) {
         this._attribute__set('disabled', disabled);
-        this._pointers__release();
     }
 
     get flickTime_max() {
@@ -121,7 +150,6 @@ export class GestureArea extends Component {
     }
     set swipe_disabled(swipe_disabled) {
         this._attribute__set('swipe_disabled', swipe_disabled);
-        this._pointers__release();
     }
 
     get tap_disabled() {
@@ -129,7 +157,6 @@ export class GestureArea extends Component {
     }
     set tap_disabled(tap_disabled) {
         this._attribute__set('tap_disabled', tap_disabled);
-        this._pointers__release();
     }
 
     get taps_interval() {
@@ -140,39 +167,31 @@ export class GestureArea extends Component {
     }
 
 
+    _capture__make(pointer) {
+        this._press__init(pointer);
+        this.event__dispatch('capture', {pointer});
+    }
+
     _eventListeners__define() {
         this._eventListeners_shadow__add({
-            lostpointercapture: this._on_lostPointerCapture.bind(this),
+            dragstart: this._on_dragStart,
             pointerdown: this._on_pointerDown.bind(this),
+            pointerup: this._on_pointerUp.bind(this),
         });
     }
 
-    _flick__dispatch(pointer, timeStamp) {
-        if (this.swipe_disabled || !pointer.swipe || timeStamp - pointer.timeStamp > this.flickTime_max) return;
+    _flick__make(pointer) {
+        if (this.swipe_disabled || !pointer.swipe || this._timeStamp - pointer.timeStamp > this.flickTime_max) return;
+
+        pointer.velocity__define();
+
+        if (pointer._velocity.is_zero()) return;
 
         this.event__dispatch('flick', {pointer});
     }
 
-    _init() {
-        this.props__sync('disabled', 'swipe_disabled', 'tap_disabled');
-    }
-
-    _on_lostPointerCapture(event) {
-        let pointer = this._pointers.get(event.pointerId);
-
-        if (!pointer) return;
-
-        this._pointers.delete(pointer.id);
-
-        this._flick__dispatch(pointer, event.timeStamp);
-        this._press__cancel(pointer);
-        this._swipe_end__dispatch(pointer);
-        this._tap__dispatch(pointer, event.timeStamp);
-        this.event__dispatch('release', {pointer});
-
-        if (!this._pointers.size) {
-            this.removeEventListener('pointermove', this._on_pointerMove);
-        }
+    _on_dragStart(event) {
+        event.preventDefault();
     }
 
     _on_pointerDown(event) {
@@ -182,48 +201,94 @@ export class GestureArea extends Component {
             this.addEventListener('pointermove', this._on_pointerMove);
         }
 
+        this._timeStamp__update();
+
         let pointer = this._pointer__add(event);
-        this._pointer__capture(pointer, event);
-        this._press__init(pointer);
-        this.event__dispatch('capture', {pointer});
+        this._capture__make(pointer);
     }
 
     _on_pointerMove(event) {
-        let pointer = this._pointers.get(event.pointerId);
-        this._pointer__update(pointer, event);
+        if (this.disabled) return;
 
+        let pointer = this._pointers.get(event.pointerId);
+
+        if (!pointer) return;
+
+        this._timeStamp__update();
+
+        this._pointer__update(pointer, event);
         this._press__cancel(pointer);
-        this._swipe_begin__dispatch(pointer);
-        this._swipe__dispatch(pointer);
+        this._swipe__make(pointer);
+    }
+
+    _on_pointerUp(event) {
+        let pointer = this._pointers.get(event.pointerId);
+
+        if (!pointer) return;
+
+        this._timeStamp__update();
+
+        this._tap__make(pointer);
+        this._swipe__stop(pointer);
+        this._flick__make(pointer);
+        this._release__make(pointer);
+
+        this._pointer__delete(pointer);
+        this._press__cancel(pointer);
+
+        if (!this._pointers.size) {
+            this.removeEventListener('pointermove', this._on_pointerMove);
+        }
     }
 
     _pointer__add(event) {
         let pointer = new this.constructor._Pointer();
-        pointer.event_press_time = this.press_time;
         pointer.id = event.pointerId;
-        pointer.is_primary = event.isPrimary;
         pointer.target = event.target;
-        pointer.timeStamp = event.timeStamp;
-        pointer.timeStamp_initial = pointer.timeStamp;
-        pointer.position.set(event.pageX, event.pageY);
-        pointer.position_initial.set_vector(pointer.position);
+        pointer.timeStamp_initial = this._timeStamp;
+        pointer.timeStamp = pointer.timeStamp_initial;
+        pointer.position_initial.set(event.pageX, event.pageY);
+        pointer.position_inner_initial.set(event.offsetX, event.offsetY);
+        pointer.position.set_vector(pointer.position_initial);
+        pointer.points__update();
         this._pointers.set(pointer.id, pointer);
+
+        this._pointer_main = pointer;
+
+        if (!event.GestureArea__pointer_captured) {
+            event.GestureArea__pointer_captured = true;
+            pointer.capture();
+        }
 
         return pointer;
     }
 
-    _pointer__capture(pointer, event) {
-        if (event.GestureArea__pointer_captured) return;
+    _pointer__delete(pointer) {
+        pointer.release();
+        this._pointers.delete(pointer.id);
 
-        event.GestureArea__pointer_captured = true;
-        pointer.target.setPointerCapture(pointer.id);
+        // if (this._pointers.size) {
+        //     this._pointer_main = [...this._pointers.values()].at(-1);
+
+        //     if (pointer.swipe) {
+        //         this._pointer_main.position_initial.set_vector(this._pointer_main.position).sub(pointer.position_delta);
+        //     }
+        // }
+        // else {
+        //     this._pointer_main = null;
+        // }
+
+        if (pointer == this._pointer_main) {
+            this._pointer_main = null;
+        }
     }
 
     _pointer__update(pointer, event) {
-        pointer.timeStamp = event.timeStamp;
-        pointer.velocity.set(event.pageX, event.pageY).sub(pointer.position).prod(this.gain);
+        pointer.timeStamp = this._timeStamp;
+        pointer.movement.set(event.pageX, event.pageY).sub(pointer.position);
         pointer.position.set(event.pageX, event.pageY);
         pointer.position_delta.set_vector(pointer.position).sub(pointer.position_initial);
+        pointer.position_inner.set(event.offsetX, event.offsetY);
 
         if (!pointer.shifted) {
             if (pointer.position_delta.length < this.shift) return;
@@ -232,63 +297,60 @@ export class GestureArea extends Component {
 
             if (!this.shift_jump) {
                 pointer.position_initial.sum(pointer.position_delta.length__set(this.shift - 1));
-                pointer.position_delta.set_vector(pointer.position).sub(pointer.position_initial);
+                pointer.position_delta.set(0);
             }
         }
 
+        pointer.points__update();
         pointer.position_delta.prod(this.gain);
     }
 
-    _pointers__release() {
-        for (let pointer of this._pointers.values()) {
-            pointer.target.releasePointerCapture(pointer.id);
-        }
-    }
-
     _press__cancel(pointer) {
-        if (!pointer.swipe && this._pointers.has(pointer.id)) return;
+        if (!pointer.shifted && this._pointers.has(pointer.id)) return;
 
         clearTimeout(pointer.press_timeout_id);
     }
 
-    _press__dispatch(pointer) {
+    _press__init(pointer) {
+        if (this.tap_disabled) return;
+
+        pointer.press_timeout_id = setTimeout(() => this._press__make(pointer), this.press_time);
+    }
+
+    _press__make(pointer) {
         if (pointer.shifted || !this.contains(document.elementFromPoint(pointer.position.x, pointer.position.y))) return;
 
         this._taps_count__update(pointer);
         this.event__dispatch('press', {pointer, taps_count: this._taps_count});
     }
 
-    _press__init(pointer) {
-        if (this.tap_disabled) return;
-
-        pointer.press_timeout_id = setTimeout(() => this._press__dispatch(pointer), this.press_time);
+    _release__make(pointer) {
+        this.event__dispatch('release', {pointer});
     }
 
-    _swipe__dispatch(pointer) {
+    _swipe__make(pointer) {
+        if (this.swipe_disabled || !pointer.shifted) return;
+
+        if (!pointer.swipe) {
+            pointer.swipe = this.event__dispatch('swipe_start', {pointer});
+        }
+
+        if (pointer.swipe) {
+            this.event__dispatch('swipe', {pointer});
+        }
+    }
+
+    _swipe__stop(pointer) {
         if (this.swipe_disabled || !pointer.swipe) return;
 
-        this.event__dispatch('swipe', {pointer});
+        this.event__dispatch('swipe_stop', {pointer});
     }
 
-    _swipe_begin__dispatch(pointer) {
-        if (this.swipe_disabled || pointer.swipe || !pointer.shifted) return;
-
-        pointer.swipe = this.event__dispatch('swipe_begin', {pointer});
-        this._swipe ||= pointer.swipe;
-    }
-
-    _swipe_end__dispatch(pointer) {
-        if (this.swipe_disabled || !pointer.swipe) return;
-
-        this._swipe = !!this._pointers.size;
-        this.event__dispatch('swipe_end', {pointer});
-    }
-
-    _tap__dispatch(pointer, timeStamp) {
+    _tap__make(pointer) {
         if (
             this.tap_disabled
             || pointer.shifted
-            || timeStamp - pointer.timeStamp_initial > this.press_time
+            || this._timeStamp - pointer.timeStamp_initial > this.press_time
             || !this.contains(document.elementFromPoint(pointer.position.x, pointer.position.y))
         ) return;
 
@@ -299,20 +361,19 @@ export class GestureArea extends Component {
     _taps_count__update(pointer) {
         if (
             pointer.timeStamp_initial - this._tap_prev_timeStamp <= this.taps_interval
-            && this._tap_prev_position.sub(pointer.position).length <= this.shift
+            && this._tap_first_position?.clone().sub(pointer.position).length <= this.shift
         ) {
             this._taps_count++;
         }
         else {
+            this._tap_first_position = pointer.position;
             this._taps_count = 1;
         }
 
-        this._tap_prev_timeStamp = pointer.timeStamp_initial;
-        this._tap_prev_position.set_vector(pointer.position);
+        this._tap_prev_timeStamp = pointer.timeStamp;
     }
 
-
-    refresh() {
-        this._pointers__release();
+    _timeStamp__update() {
+        this._timeStamp = performance.now();
     }
 }

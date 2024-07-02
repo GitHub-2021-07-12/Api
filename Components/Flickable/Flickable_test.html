@@ -5,6 +5,7 @@
     <head>
         <meta charset='utf-8'>
         <meta name='viewport' content='width=720, user-scalable=no'>
+        <!-- <meta name='viewport' content='width=device-width, user-scalable=no'> -->
         <title>Flickable</title>
 
         <style>
@@ -35,13 +36,15 @@
             }
 
             x-flickable {
-                --gap: 4px;
-                --puck__margin_outer: 10px;
+                --Flickable__scrollBar__width: 100px;
+                --Flickable__gap: 4px;
+                --Flickable__puck__margin_outer: 10px;
                 border: 1px solid #444;
                 font: 24px 'Arial';
-                overflow-y: clip;
+                /* overflow-y: clip; */
 
                 &::part(content) {
+                    display: inline-block;
                     margin: 20px;
                     padding: 20px;
                 }
@@ -50,13 +53,21 @@
                 /*     background: #0002; */
                 /* } */
 
-                &::part(puck) {
-                    background: red;
-                }
+                /* &::part(puck) { */
+                /*     background: #00f4; */
+                /* } */
 
-                &[_swipe] {
-                    background: #0f02;
-                }
+                /* &::part(scrollBar) { */
+                /*     --TrackBar__width: 20px; */
+                /* } */
+
+                /* &:active { */
+                /*     background: #f002; */
+                /* } */
+
+                /* &[_swipe] { */
+                /*     background: #0f02; */
+                /* } */
             }
 
 
@@ -69,7 +80,7 @@
                 grid-template: 100% / 1fr 1fr;
                 height: 100dvh;
                 padding: 10px;
-                touch-action: none;
+                /* touch-action: none; */
                 user-select: none;
             }
         </style>
@@ -79,7 +90,7 @@
 
 
             let root = document.querySelector('#root');
-            root.addEventListener('touchstart', (event) => event.preventDefault());
+            root.addEventListener('touchstart', (event) => event.preventDefault(), {passive: false});
 
             window.addEventListener('error', (event) => {
                 alert(event.filename + ' ' + event.message + ' ' + event.lineno);
@@ -93,8 +104,12 @@
 
             textArea.value = Array(100).join(flickables[1].textContent);
             flickables[0].refresh();
-            flickables[1].textContent = Array(100).join(flickables[1].textContent);
+            flickables[1].innerHTML = Array(100).join(flickables[1].innerHTML);
             flickables[1].refresh();
+
+            // flickables[1].scroll_x = 100;
+            // flickables[1].scroll_y = 0;
+            // flickables[1].refresh();
 
             flickables[0].eventListeners__add({
                 press: (event) => console.log(event, event.detail.taps_count),
@@ -108,7 +123,9 @@
             <x-flickable shift='50' disabled_ swipe_disabled tap_disabled_>
                 <textArea slot='display' spellCheck='false' disabled_ readOnly_></textArea>
             </x-flickable>
-            <x-flickable>
+
+            <x-flickable shift='20' snag='button' shift_jump_>
+                <!-- <button>Button</button> -->
                 abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
             </x-flickable>
         </div>

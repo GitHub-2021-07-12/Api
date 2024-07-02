@@ -117,8 +117,8 @@ export class Vector_2d {
     }
 
     to_range(vector_min, vector_max) {
-        this.x = Common.to_range(this.x, vector_min.x, vector_max.x);
-        this.y = Common.to_range(this.y, vector_min.y, vector_max.y);
+        this.x__to_range(vector_min.x, vector_max.x);
+        this.y__to_range(vector_min.y, vector_max.y);
 
         return this;
     }

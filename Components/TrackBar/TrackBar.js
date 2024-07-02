@@ -13,6 +13,9 @@ export class TrackBar extends Component {
     static _attributes = {
         ...super._attributes,
 
+        _active: false,
+
+
         disabled: false,
         gain: {
             default: 1,
@@ -56,6 +59,14 @@ export class TrackBar extends Component {
 
     _puck_length = 0;
     _track_length = 0;
+
+
+    get _active() {
+        return this._attributes._active;
+    }
+    set _active(active) {
+        this._attribute__set('_active', active);
+    }
 
 
     get disabled() {
@@ -153,7 +164,11 @@ export class TrackBar extends Component {
     }
 
     _eventListeners__define() {
-        this._elements.puck.addEventListener('drag', this._puck__on_drag.bind(this));
+        this._elements.puck.eventListeners__add({
+            drag: this._puck__on_drag.bind(this),
+            drag_start: this._puck__on_drag_start.bind(this),
+            drag_stop: this._puck__on_drag_stop.bind(this),
+        });
     }
 
     _init() {
@@ -166,6 +181,14 @@ export class TrackBar extends Component {
         this.value = this.value_min + puck_position / this._elements.puck.step;
 
         this.event__dispatch('change');
+    }
+
+    _puck__on_drag_start() {
+        this._active = true;
+    }
+
+    _puck__on_drag_stop() {
+        this._active = false;
     }
 
     _puck_position__define() {

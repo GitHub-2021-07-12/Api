@@ -29,7 +29,7 @@
                     background: #faa;
                 }
 
-                &[_swipe] {
+                &[_drag] {
                     background: #afa;
                 }
             }
@@ -66,8 +66,9 @@
                 place-content: center;
                 width: 100%;
 
-                &:not([_swipe]) {
-                    transition: 0.05s;
+                &:not([_drag]) {
+                /* &:not(:active) { */
+                    transition: 0.2s;
                     transition-property: left, top;
                 }
             }
@@ -86,6 +87,8 @@
                     console.log(event)
                 },
             });
+            // draggables[0].handle = draggables[1];
+            draggables[0].handle = '#stick__puck';
             draggables[1].eventListeners__add({
                 press: (event) => {
                     console.log(event)
@@ -101,13 +104,13 @@
             // });
 
             // let root = document.querySelector('#root');
-            // root.addEventListener('touchstart', (event) => event.preventDefault());
+            root.addEventListener('touchstart', (event) => event.preventDefault());
         </script>
     </head>
 
     <body>
         <div id='root'>
-            <x-draggable id='stick' axis='y' shift='50' tap_disabled_>
+            <x-draggable id='stick' axis='y' handle_='#stick__puck' shift='50' tap_disabled_>
                 <x-draggable
                     id='stick__puck'
 

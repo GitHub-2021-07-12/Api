@@ -36,7 +36,7 @@ export class Leafable extends GestureArea {
         },
         looped: false,
         velocity_min: {
-            default: 5,
+            default: 1e3,
             range: [0, Infinity],
         },
         vertical: false,
@@ -70,7 +70,6 @@ export class Leafable extends GestureArea {
     _animations_duration = 0;
     _animations_playbackRate = 0;
     _animations_progress = 0;
-    _animations_progress_increment = 0;
     _delta = 0;
     _index_prev = NaN;
     _item_current_index = NaN;
@@ -230,7 +229,7 @@ export class Leafable extends GestureArea {
             flick: this._on_flick,
             release: this._on_release,
             swipe: this._on_swipe,
-            swipe_begin: this._on_swipe_begin,
+            swipe_start: this._on_swipe_start,
         });
     }
 
@@ -241,9 +240,8 @@ export class Leafable extends GestureArea {
     }
 
     _init() {
-        super._init();
-
         this.props__sync('index');
+        this.refresh();
     }
 
     _item_current__set(item_current_index = NaN) {
@@ -278,21 +276,18 @@ export class Leafable extends GestureArea {
 
     _on_flick(event) {
         let pointer = event.detail.pointer;
-        let velocity = this.vertical ? pointer.velocity.y : pointer.velocity.x;
-        let velocity_abs = Math.abs(velocity);
 
-        if (velocity_abs < this.velocity_min) {
-            this._velocity = 0;
-            this._animations_progress_increment = 0;
-        }
-        else {
-            this._velocity = velocity;
-            this._animations_progress_increment = velocity_abs / this._size * this.gain;
-        }
+        if (pointer != this._pointer_main) return;
+
+        let velocity = this.vertical ? pointer._velocity.y : pointer._velocity.x;
+
+        if (Math.abs(velocity) < this.velocity_min) return;
+
+        this._velocity = velocity;
     }
 
-    _on_release() {
-        if (!this._animations) return;
+    _on_release(event) {
+        if (!this._animations || event.detail.pointer != this._pointer_main) return;
 
         if (
             !this._velocity && this._animations_progress < this.delta
@@ -309,6 +304,9 @@ export class Leafable extends GestureArea {
 
     _on_swipe(event) {
         let pointer = event.detail.pointer;
+
+        if (pointer != this._pointer_main) return;
+
         let delta = this._delta + (this.vertical ? pointer.position_delta.y : pointer.position_delta.x);
         let animation_direction = Math.sign(delta || 1);
 
@@ -323,40 +321,44 @@ export class Leafable extends GestureArea {
         this._animations_progress__set(delta / this._size * this._animations_direction * this.gain);
     }
 
-    _on_swipe_begin(event) {
-        if (!this.children.length) {
-            event.preventDefault();
+    _on_swipe_start(event) {
+        if (this.children.length || event.detail.pointer != this._pointer_main) return;
 
-            return;
-        }
-
-        this._size = this.vertical ? this.height_inner__get() : this.width_inner__get();
+        event.preventDefault();
     }
 
     _render() {
-        if (
-            this._animations_playbackRate < 0 && this._animations_progress <= 0
-            || this._animations_playbackRate > 0 && this._animations_progress >= 1
-        ) {
-            this._renderer.stop();
+        let animations_progress_increment = 0;
+        let animations_progress_increment_min = this._renderer._dt * 1e3 / this._animations_duration;
 
-            this._animations_progress_increment = 0;
-            this._delta = 0;
-            this._velocity = 0;
-            this._animations_direction__set();
-            this.index = this.index;
-            this._animations_progress__set();
-
-            this.event__dispatch('animation_end');
-
-            return;
+        if (this._animations_playbackRate < 0) {
+            animations_progress_increment = -animations_progress_increment_min;
+        }
+        else {
+            animations_progress_increment = Math.abs(this._velocity) * this._renderer._dt / this._size * this.gain;
+            animations_progress_increment = Math.max(animations_progress_increment, animations_progress_increment_min);
         }
 
-        let animations_progress_increment_min = this._renderer._dt / this._animations_duration;
-        let animations_progress_increment = this._animations_playbackRate < 0
-            ? -animations_progress_increment_min
-            : Math.max(this._animations_progress_increment, animations_progress_increment_min)
-        ;
         this._animations_progress__set(this._animations_progress + animations_progress_increment);
+
+        if (
+            this._animations_playbackRate < 0 && this._animations_progress > 0
+            || this._animations_playbackRate > 0 && this._animations_progress < 1
+        ) return;
+
+        this._renderer.stop();
+
+        this._delta = 0;
+        this._velocity = 0;
+        this._animations_direction__set();
+        this._animations_progress__set();
+        this.props__sync('index');
+
+        this.event__dispatch('animation_stop');
+    }
+
+
+    refresh() {
+        this._size = this.vertical ? this.height_inner__get() : this.width_inner__get();
     }
 }

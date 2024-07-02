@@ -10,6 +10,9 @@ export class Draggable extends GestureArea {
     static _attributes = {
         ...super._attributes,
 
+        _drag: false,
+
+
         axis: {
             default: '',
             enum: ['x', 'y'],
@@ -41,6 +44,7 @@ export class Draggable extends GestureArea {
     }
 
 
+    _handle = null;
     _pointer_delta = new Vector_2d();
     _position = new Vector_2d();
     _position_delta = new Vector_2d();
@@ -53,6 +57,14 @@ export class Draggable extends GestureArea {
     position_min = null;
 
 
+    get _drag() {
+        return this._attributes._drag;
+    }
+    set _drag(drag) {
+        this._attribute__set('_drag', drag);
+    }
+
+
     get axis() {
         return this._attributes.axis;
     }
@@ -61,10 +73,11 @@ export class Draggable extends GestureArea {
     }
 
     get handle() {
-        return this._attributes.handle;
+        return this._handle;
     }
     set handle(handle) {
-        this._attribute__set('handle', handle);
+        this._handle = handle;
+        this._attribute__set('handle', this._handle);
     }
 
     get position() {
@@ -118,7 +131,31 @@ export class Draggable extends GestureArea {
     }
 
 
-    _drag__init() {
+    _drag__make(pointer) {
+        this._pointer_delta
+            .set_vector(pointer.position_delta)
+            .sum(this._position_delta)
+            .length__to_range(0, this.radius)
+        ;
+
+        if (this.axis != 'x') {
+            let step = this.step_y || this.step;
+            this._position.y = this.position_initial.y + Math.round(this._pointer_delta.y / step) * step;
+        }
+
+        if (this.axis != 'y') {
+            let step = this.step_x || this.step;
+            this._position.x = this.position_initial.x + Math.round(this._pointer_delta.x / step) * step;
+        }
+
+        this._position.to_range(this._position_min, this._position_max).round();
+        this.position = this._position;
+
+        this.event__dispatch('drag');
+    }
+
+    _drag__start() {
+        this._drag = true;
         this._position.set_vector(this.position);
         this._position_delta.set_vector(this._position).sub(this.position_initial);
 
@@ -142,29 +179,17 @@ export class Draggable extends GestureArea {
         else {
             this._position_min.set(-Infinity);
         }
+
+        this.event__dispatch('drag_start');
     }
 
-    _drag__make(pointer_delta) {
-        this._pointer_delta
-            .set_vector(pointer_delta)
-            .sum(this._position_delta)
-            .length__to_range(0, this.radius)
-        ;
+    _drag__stop() {
+        this._drag = false;
+        this.event__dispatch('drag_stop');
 
-        if (this.axis != 'x') {
-            let step = this.step_y || this.step;
-            this._position.y = this.position_initial.y + Math.round(this._pointer_delta.y / step) * step;
-        }
+        if (!this.spring) return;
 
-        if (this.axis != 'y') {
-            let step = this.step_x || this.step;
-            this._position.x = this.position_initial.x + Math.round(this._pointer_delta.x / step) * step;
-        }
-
-        this._position.to_range(this._position_min, this._position_max).round();
-        this.position = this._position;
-
-        this.event__dispatch('drag');
+        requestAnimationFrame(() => this.position = this.position_initial);
     }
 
     _eventListeners__define() {
@@ -172,39 +197,49 @@ export class Draggable extends GestureArea {
 
         this.eventListeners__add({
             swipe: this._on_swipe,
-            swipe_begin: this._on_swipe_begin,
-            swipe_end: this._on_swipe_end,
+            swipe_start: this._on_swipe_start,
+            swipe_stop: this._on_swipe_stop,
         });
     }
 
-    _handle__check(element) {
+    _handle__check(target) {
         try {
-            let handle = element.closest(this.handle);
+            let handle = this.handle instanceof HTMLElement ? this.handle : target.closest(this.handle);
 
-            if (!this.contains(handle)) return false;
+            return this.contains(handle) && handle.contains(target);
         }
         catch {}
 
         return true;
     }
 
-    _on_swipe(event) {
-        this._drag__make(event.detail.pointer.position_delta);
+    _init() {
+        this.props__sync('handle');
     }
 
-    _on_swipe_begin(event) {
-        if (!this._handle__check(event.detail.target)) {
+    _on_swipe(event) {
+        let pointer = event.detail.pointer;
+
+        if (pointer != this._pointer_main) return;
+
+        this._drag__make(pointer);
+    }
+
+    _on_swipe_start(event) {
+        let pointer = event.detail.pointer;
+
+        if (pointer != this._pointer_main || !this._handle__check(pointer.target)) {
             event.preventDefault();
 
             return;
         }
 
-        this._drag__init();
+        this._drag__start();
     }
 
-    _on_swipe_end(event) {
-        if (!this.spring) return;
+    _on_swipe_stop(event) {
+        if (event.detail.pointer != this._pointer_main) return;
 
-        this.position = this.position_initial;
+        this._drag__stop();
     }
 }

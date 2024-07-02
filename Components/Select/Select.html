@@ -1,16 +1,14 @@
 <div class='root'>
     <x-edit class='edit' button_clear part='edit'></x-edit>
 
-    <dialog class='list' tabIndex='-1'>
-        <!-- <div popover> -->
-            <x-flickable class='flickable' part='flickable' tabIndex='-1'>
-                <x-repeater class='repeater' interpolation='repeater' model='10'>
-                    <template Repeater__delegate>
-                        <div>{{repeater: _index}}</div>
-                    </template>
-                    <!-- <slot></slot> -->
-                </x-repeater>
-            </x-flickable>
-        <!-- </div> -->
+    <dialog class='popup' part='popup' tabIndex='-1'>
+        <x-flickable class='flickable' part='flickable' tabIndex='-1'>
+            <x-repeater class='repeater' interpolation='repeater' model_='10'>
+                <template Repeater__delegate>
+                    <div>{{repeater: _index}}</div>
+                </template>
+                <!-- <slot></slot> -->
+            </x-repeater>
+        </x-flickable>
     </dialog>
 </div>
