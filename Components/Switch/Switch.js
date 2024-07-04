@@ -13,6 +13,11 @@ export class Switch extends Component {
         vertical: false,
     };
 
+    static _eventListeners = {
+        pointerdown: '_on_pointerDown',
+        transitionend: '_on_transitionEnd',
+    };
+
 
     static css_url = true;
     static html_url = true;
@@ -61,13 +66,6 @@ export class Switch extends Component {
         this._attribute__set('vertical', vertical);
     }
 
-
-    _eventListeners__define() {
-        this.eventListeners__add({
-            pointerdown: this._on_pointerDown,
-            transitionend: this._on_transitionEnd,
-        });
-    }
 
     _on_pointerDown() {
         if (this.disabled) return;

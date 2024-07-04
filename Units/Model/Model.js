@@ -50,28 +50,30 @@ export class Model extends EventManager {
 
 
     add(items, index = Infinity) {
-        index = Common.to_range(index, 0, this._items.length);
-        items = items instanceof Array ? items : [items];
+        if (!(items instanceof Array)) {
+            items = [items];
+        }
 
         if (!items.length) return;
 
+        index = Common.to_range(index, 0, this._items.length);
         items = items.map((item) => this._item__proc(item));
         this._items.splice(index, 0, ...items);
         this._items_indexes__define(index);
-
         this.event__dispatch('add', {index, items});
     }
 
     clear() {
         this._items.length = 0;
-
         this.event__dispatch('clear');
     }
 
     delete(indexes) {
         if (!this._items.length) return;
 
-        indexes = indexes instanceof Array ? indexes : [indexes];
+        if (!(indexes instanceof Array)) {
+            indexes = [indexes];
+        }
 
         let items = [];
 
@@ -89,7 +91,6 @@ export class Model extends EventManager {
 
         this._items = this._items.flat();
         this._items_indexes__define();
-
         this.event__dispatch('delete', {items});
     }
 
@@ -101,7 +102,6 @@ export class Model extends EventManager {
 
         let items = this._items.splice(index, count);
         this._items_indexes__define(index);
-
         this.event__dispatch('delete', {items});
     }
 
@@ -134,7 +134,6 @@ export class Model extends EventManager {
         let items = this._items.splice(index_from, count);
         this._items.splice(index_to, 0, ...items);
         this._items_indexes__define(Math.min(index_from, index_to));
-
         this.event__dispatch('order');
     }
 
@@ -143,7 +142,6 @@ export class Model extends EventManager {
 
         this._items.sort(sorter);
         this._items_indexes__define();
-
         this.event__dispatch('order');
     }
 

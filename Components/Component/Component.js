@@ -12,40 +12,15 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     static _defined = null;
     static _dom = null;
     static _elements = {};
+    static _eventListeners = {};
+    static _eventListeners_elements = {};
+    static _eventListeners_shadow = {};
+    static _eventListeners_slots = {};
     static _slots = [];
     static _tag = '';
 
     static _attributes = {
         _building: false,
-    };
-
-    static _eventListeners = {
-        elements: {
-            scrollBar_x: {
-                change: '_scrollBar_x__on_value_change',
-            },
-            scrollBar_y: {
-                change: '_scrollBar_y__on_value_change',
-            },
-        },
-        shadow: {
-
-        },
-        slots: {
-            display: {
-                scroll: '_display__on_scroll',
-                wheel: '_display__on_wheel',
-            },
-        },
-        this: {
-            ...super._eventListeners?.this,
-
-            capture: '_on_capture',
-            flick: '_on_flick',
-            swipe: function (event) {},
-            swipe_start: ['_on_swipe_start', {passive: false}],
-            swipe_stop: [this.prototype._on_swipe_stop, false],
-        },
     };
 
 
@@ -280,7 +255,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         let f = (match, string_key, string_value) => {
             if (string_key != key) return match;
 
-            return Common.extract(interpolations, string_value) ?? '';
+            return Common.object__extract(interpolations, string_value) ?? '';
         };
 
         return string.replace(this.interpolation_regExp, f);
@@ -430,8 +405,11 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     _built = new ExternalPromise();
     _elements = {};
     _eventListeners = {};
-    _slots = {};
+    _eventListeners_elements = {};
+    _eventListeners_shadow = {};
+    _eventListeners_slots = {};
     _shadow = null;
+    _slots = {};
 
 
     get _building() {
@@ -517,8 +495,9 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
             ]);
         }
 
-        await this._init();
         this._eventListeners__define();
+        this._eventListeners__apply();
+        await this._init();
 
         this._building = false;
         this._built.fulfill(true);
@@ -536,16 +515,18 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
         await Promise.all(promises);
     }
 
-    _eventListeners__define() {}
-
-    _eventListeners_shadow__add(eventListeners, opts = null) {
-        let eventTarget = this._shadow ?? this;
-        this.constructor.eventListeners__add(eventTarget, eventListeners, opts);
+    _eventListeners__apply(add = true) {
+        this.eventListeners__apply(this._eventListeners, add);
+        this.constructor.eventListeners__apply(this._shadow || this, this._eventListeners_shadow, add);
+        this.constructor.eventListeners_grouped__apply(this._elements, this._eventListeners_elements, add);
+        this.constructor.eventListeners_grouped__apply(this._slots, this._eventListeners_slots, add);
     }
 
-    _eventListeners_shadow__remove(eventListeners, opts = null) {
-        let eventTarget = this._shadow ?? this;
-        this.constructor.eventListeners__remove(eventTarget, eventListeners, opts);
+    _eventListeners__define() {
+        this._eventListeners = this._eventListeners__proc(this.constructor._eventListeners);
+        this._eventListeners_elements = this._eventListeners__proc(this.constructor._eventListeners_elements, true);
+        this._eventListeners_shadow = this._eventListeners__proc(this.constructor._eventListeners_shadow, this._shadow);
+        this._eventListeners_slots = this._eventListeners__proc(this.constructor._eventListeners_slots, true);
     }
 
     _init() {}

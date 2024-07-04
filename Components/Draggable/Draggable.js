@@ -38,6 +38,12 @@ export class Draggable extends GestureArea {
         unbounded: false,
     };
 
+    static _eventListeners = {
+        swipe: '_on_swipe',
+        swipe_start: '_on_swipe_start',
+        swipe_stop: '_on_swipe_stop',
+    };
+
 
     static {
         this.define();
@@ -190,16 +196,6 @@ export class Draggable extends GestureArea {
         if (!this.spring) return;
 
         requestAnimationFrame(() => this.position = this.position_initial);
-    }
-
-    _eventListeners__define() {
-        super._eventListeners__define();
-
-        this.eventListeners__add({
-            swipe: this._on_swipe,
-            swipe_start: this._on_swipe_start,
-            swipe_stop: this._on_swipe_stop,
-        });
     }
 
     _handle__check(target) {

@@ -34,6 +34,31 @@ export class Edit extends Component {
         input: '',
     };
 
+    static _eventListeners = {
+        touchstart: '_on_touchStart',
+    };
+
+    static _eventListeners_elements = {
+        button_clear: {
+            pointerdown: '_button_clear__on_pointerDown',
+        },
+        button_mask: {
+            pointerdown: '_button_mask__on_pointerDown',
+        },
+        input: {
+            beforeinput: '_input__on_beforeInput',
+            blur: '_input__on_blur',
+            compositionend: '_input__on_compositionEnd',
+            compositionstart: '_input__on_compositionStart',
+            dragend: '_input__on_dragEnd',
+            dragstart: '_input__on_dragStart',
+            drop: '_input__on_drop',
+            focus: '_input__on_focus',
+            input: '_input__on_input',
+            pointerdown: '_input__on_pointerDown',
+        },
+    };
+
 
     static css_url = true;
     static html_url = true;
@@ -204,27 +229,6 @@ export class Edit extends Component {
         event.preventDefault();
 
         this.masked = !this.masked;
-    }
-
-    _eventListeners__define() {
-        this.addEventListener('touchstart', this._on_touchStart);
-        this._elements.button_clear.addEventListener('pointerdown', this._button_clear__on_pointerDown.bind(this));
-        this._elements.button_mask.addEventListener('pointerdown', this._button_mask__on_pointerDown.bind(this));
-        this.constructor.eventListeners__add(
-            this._elements.input,
-            {
-                beforeinput: this._input__on_beforeInput.bind(this),
-                blur: this._input__on_blur.bind(this),
-                compositionend: this._input__on_compositionEnd.bind(this),
-                compositionstart: this._input__on_compositionStart.bind(this),
-                dragend: this._input__on_dragEnd.bind(this),
-                dragstart: this._input__on_dragStart.bind(this),
-                drop: this._input__on_drop.bind(this),
-                focus: this._input__on_focus.bind(this),
-                input: this._input__on_input.bind(this),
-                pointerdown: this._input__on_pointerDown.bind(this),
-            },
-        );
     }
 
     _init() {

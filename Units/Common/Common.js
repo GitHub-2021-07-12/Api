@@ -15,7 +15,15 @@ export class Common {
         return this.execute(`return (${js_expression});`, args);
     }
 
-    static extract(object, path) {
+    static in_range(value, value_min, value_max) {
+        return value >= value_min && value <= value_max;
+    }
+
+    static in_range_strict(value, value_min, value_max) {
+        return value > value_min && value < value_max;
+    }
+
+    static object__extract(object, path) {
         let aim = object;
         let props = path.split('.');
 
@@ -26,14 +34,6 @@ export class Common {
         }
 
         return aim;
-    }
-
-    static in_range(value, value_min, value_max) {
-        return value >= value_min && value <= value_max;
-    }
-
-    static in_range_strict(value, value_min, value_max) {
-        return value > value_min && value < value_max;
     }
 
     static to_range(value, value_min, value_max) {

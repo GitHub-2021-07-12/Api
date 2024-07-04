@@ -26,6 +26,23 @@ export class TextArea extends Component {
         input: '',
     };
 
+    static _eventListeners = {
+        touchstart: '_on_touchStart',
+    };
+
+    static _eventListeners_elements = {
+        input: {
+            beforeinput: '_input__on_beforeInput',
+            blur: '_input__on_blur',
+            dragend: '_input__on_dragEnd',
+            dragstart: '_input__on_dragStart',
+            drop: '_input__on_drop',
+            focus: '_input__on_focus',
+            input: '_input__on_input',
+            pointerdown: '_input__on_pointerDown',
+        },
+    };
+
 
     static css_url = true;
     static html_url = true;
@@ -89,23 +106,6 @@ export class TextArea extends Component {
         this.refresh();
     }
 
-
-    _eventListeners__define() {
-        this.addEventListener('touchstart', this._on_touchStart);
-        this.constructor.eventListeners__add(
-            this._elements.input,
-            {
-                beforeinput: this._input__on_beforeInput.bind(this),
-                blur: this._input__on_blur.bind(this),
-                dragend: this._input__on_dragEnd.bind(this),
-                dragstart: this._input__on_dragStart.bind(this),
-                drop: this._input__on_drop.bind(this),
-                focus: this._input__on_focus.bind(this),
-                input: this._input__on_input.bind(this),
-                pointerdown: this._input__on_pointerDown.bind(this),
-            },
-        );
-    }
 
     _height__define() {
         this.constructor.height_outer__set(this._elements.input, 1);

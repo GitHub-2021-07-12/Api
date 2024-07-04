@@ -98,14 +98,14 @@
                 model.sort();
             });
 
-            repeaters[0].addEventListener('click', (event) => {
-                if (!event.target.Repeater__manager) return;
+            // repeaters[0].addEventListener('click', (event) => {
+            //     if (!event.target.Repeater__manager) return;
 
-                // let key = event.target.Repeater__manager._key;
-                // let model_item = model.get(key);
-                let model_item = event.target.Repeater__manager._model_item;
-                model.update(model_item._index, {selected: !model_item.selected});
-            });
+            //     // let key = event.target.Repeater__manager._key;
+            //     // let model_item = model.get(key);
+            //     let model_item = event.target.Repeater__manager._model_item;
+            //     model.update(model_item._index, {selected: !model_item.selected});
+            // });
 
 
             window.model = model;
@@ -139,6 +139,29 @@
                             label_index: '',
                         };
 
+                        static _eventListeners = {
+                            click: function (event) {
+                                if (event.target != this._item) return;
+
+                                this._model.update(this._model_item._index, {selected: !this._model_item.selected});
+                            },
+                        };
+
+                        static _eventListeners_elements = {
+                            button_move_left: {
+                                click: '_button_move_left__on_click',
+                            },
+                            button_move_right: {
+                                click: '_button_move_right__on_click',
+                            },
+                            button_remove: {
+                                click: '_button_remove__on_click',
+                            },
+                            input: {
+                                input: '_input__on_input',
+                            },
+                        };
+
 
                         _button_move_left__on_click() {
                             this._model.move(this._model_item._index, this._model_item._index - 1);
@@ -152,12 +175,12 @@
                             this._model.delete(this._model_item._index);
                         }
 
-                        _eventListeners__define() {
-                            this._elements.input.addEventListener('input', this._input__on_input.bind(this));
-                            this._elements.button_move_left.addEventListener('click', this._button_move_left__on_click.bind(this));
-                            this._elements.button_move_right.addEventListener('click', this._button_move_right__on_click.bind(this));
-                            this._elements.button_remove.addEventListener('click', this._button_remove__on_click.bind(this));
-                        }
+                        // _eventListeners__define() {
+                        //     this._elements.input.addEventListener('input', this._input__on_input.bind(this));
+                        //     this._elements.button_move_left.addEventListener('click', this._button_move_left__on_click.bind(this));
+                        //     this._elements.button_move_right.addEventListener('click', this._button_move_right__on_click.bind(this));
+                        //     this._elements.button_remove.addEventListener('click', this._button_remove__on_click.bind(this));
+                        // }
 
                         _input__on_input() {
                             this.data__update();
@@ -207,6 +230,14 @@
         <x-repeater interpolation='repeater' model='10'>
             <template Repeater__delegate>
                 <div>{{repeater: _index}} - {{repeater: data}}</div>
+
+                <script>
+                    class Manager extends Repeater.Manager {
+                        init() {
+                            this._item.textContent = this._model_item.data ** 2;
+                        }
+                    }
+                </script>
             </template>
         </x-repeater>
     </body>

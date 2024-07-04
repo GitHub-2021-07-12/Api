@@ -27,7 +27,9 @@ export class Class {
 
     static mix(Class, ...mixins) {
         for (let mixin of mixins) {
-            mixin = mixin instanceof Array ? mixin : [mixin];
+            if (!(mixin instanceof Array)) {
+                mixin = [mixin];
+            }
 
             let mixin_inheritanceChain = this._inheritanceChain__get(...mixin);
 

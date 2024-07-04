@@ -90,6 +90,12 @@ export class GestureArea extends Component {
         },
     };
 
+    static _eventListeners_shadow = {
+        dragstart: '_on_dragStart',
+        pointerdown: '_on_pointerDown',
+        pointerup: '_on_pointerUp',
+    };
+
 
     static {
         this.define();
@@ -170,14 +176,6 @@ export class GestureArea extends Component {
     _capture__make(pointer) {
         this._press__init(pointer);
         this.event__dispatch('capture', {pointer});
-    }
-
-    _eventListeners__define() {
-        this._eventListeners_shadow__add({
-            dragstart: this._on_dragStart,
-            pointerdown: this._on_pointerDown.bind(this),
-            pointerup: this._on_pointerUp.bind(this),
-        });
     }
 
     _flick__make(pointer) {

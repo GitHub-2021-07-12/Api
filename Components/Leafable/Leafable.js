@@ -47,6 +47,14 @@ export class Leafable extends GestureArea {
         item_prev: '',
     };
 
+    static _eventListeners = {
+        capture: '_on_capture',
+        flick: '_on_flick',
+        release: '_on_release',
+        swipe: '_on_swipe',
+        swipe_start: '_on_swipe_start',
+    };
+
 
     static animations_duration_special = 1e10;
     static css_url = true;
@@ -219,18 +227,6 @@ export class Leafable extends GestureArea {
         for (let animation of this._animations) {
             animation.currentTime = Common.to_range(this.constructor.animations_duration_special * this._animations_progress, 1, this.constructor.animations_duration_special - 1);
         }
-    }
-
-    _eventListeners__define() {
-        super._eventListeners__define();
-
-        this.eventListeners__add({
-            capture: this._on_capture,
-            flick: this._on_flick,
-            release: this._on_release,
-            swipe: this._on_swipe,
-            swipe_start: this._on_swipe_start,
-        });
     }
 
     _index__proc(index) {

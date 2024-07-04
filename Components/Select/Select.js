@@ -20,6 +20,17 @@ export class Select extends Component {
         repeater: '',
     };
 
+    static _eventListeners = {
+        focusin: '_on_focusIn',
+        focusout: '_on_focusOut',
+    };
+
+    static _eventListeners_elements = {
+        repeater: {
+            define: '_repeater__on_define',
+        },
+    };
+
 
     static css_url = true;
     static html_url = true;
@@ -38,16 +49,6 @@ export class Select extends Component {
         this._attribute__set('open', open);
     }
 
-
-    _eventListeners__define() {
-        this.eventListeners__add({
-            focusin: this._on_focusIn,
-            focusout: this._on_focusOut,
-        });
-        this._elements.repeater.addEventListener('define', this._repeater__on_define.bind(this));
-
-        // console.log(this._elements.repeater.constructor)
-    }
 
     _init() {
         this._elements.repeater.delegate = this.querySelector('[Select__delegate]');

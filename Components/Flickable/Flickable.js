@@ -56,6 +56,30 @@ export class Flickable extends GestureArea {
         scrollBar_y: '',
     };
 
+    static _eventListeners = {
+        capture: '_on_capture',
+        flick: '_on_flick',
+        swipe: '_on_swipe',
+        swipe_start: '_on_swipe_start',
+        swipe_stop: '_on_swipe_stop',
+    };
+
+    static _eventListeners_elements = {
+        scrollBar_x: {
+            change: '_scrollBar_x__on_value_change',
+        },
+        scrollBar_y: {
+            change: '_scrollBar_y__on_value_change',
+        },
+    };
+
+    static _eventListeners_slots = {
+        display: {
+            scroll: '_display__on_scroll',
+            wheel: '_display__on_wheel',
+        },
+    };
+
 
     static css_url = true;
     static html_url = true;
@@ -248,27 +272,6 @@ export class Flickable extends GestureArea {
 
     _display__on_wheel() {
         this._renderer.stop();
-    }
-
-    _eventListeners__define() {
-        super._eventListeners__define();
-
-        this._elements.scrollBar_x.addEventListener('change', this._scrollBar_x__on_value_change.bind(this));
-        this._elements.scrollBar_y.addEventListener('change', this._scrollBar_y__on_value_change.bind(this));
-        this.eventListeners__add({
-            capture: this._on_capture,
-            flick: this._on_flick,
-            swipe: this._on_swipe,
-            swipe_start: this._on_swipe_start,
-            swipe_stop: this._on_swipe_stop,
-        });
-        this.constructor.eventListeners__add(
-            this._slots.display,
-            {
-                scroll: this._display__on_scroll.bind(this),
-                wheel: this._display__on_wheel.bind(this),
-            },
-        );
     }
 
     _init() {

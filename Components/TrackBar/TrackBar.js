@@ -46,6 +46,14 @@ export class TrackBar extends Component {
         track: '',
     };
 
+    static _eventListeners_elements = {
+        puck: {
+            drag: '_puck__on_drag',
+            drag_start: '_puck__on_drag_start',
+            drag_stop: '_puck__on_drag_stop',
+        },
+    };
+
 
     static css_url = true;
     static html_url = true;
@@ -161,14 +169,6 @@ export class TrackBar extends Component {
         this._attribute__set('vertical', vertical);
         this._elements.puck.axis = this.vertical ? 'y' : 'x';
         this._puck_position__define();
-    }
-
-    _eventListeners__define() {
-        this._elements.puck.eventListeners__add({
-            drag: this._puck__on_drag.bind(this),
-            drag_start: this._puck__on_drag_start.bind(this),
-            drag_stop: this._puck__on_drag_stop.bind(this),
-        });
     }
 
     _init() {

@@ -19,9 +19,20 @@ export class Repeater extends Component {
         target: '',
     };
 
+    static _eventListeners_model = {
+        add: '_model__on_add',
+        clear: '_model__on_clear',
+        delete: '_model__on_delete',
+        filter: '_model__on_filter',
+        order: '_model__on_order',
+        update: '_model__on_update',
+    };
+
 
     static Manager = class Manager {
         static _elements = {};
+        static _eventListeners = {};
+        static _eventListeners_elements = {};
 
 
         _elements = {};
@@ -30,16 +41,15 @@ export class Repeater extends Component {
         _model_item = null;
 
 
-        _eventListeners__define() {}
-
-
         constructor({item, model, model_item} = {}) {
             this._item = item;
+            this._elements = Component.elements__get(this._item, this.constructor._elements);
+            this._eventListeners = Component.eventListeners__proc(this, this.constructor._eventListeners, true);
+            this._eventListeners_elements = Component.eventListeners__proc(this, this.constructor._eventListeners_elements, true);
             this._model = model;
             this._model_item = model_item;
-
-            this._elements = Component.elements__get(this._item, this.constructor._elements);
-            this._eventListeners__define();
+            Component.eventListeners__apply(this._item, this._eventListeners);
+            Component.eventListeners_grouped__apply(this._elements, this._eventListeners_elements);
         }
 
         data__apply() {}
@@ -60,19 +70,11 @@ export class Repeater extends Component {
     _content_initial = null;
     _delegate = null;
     _delegate_html = '';
+    _eventListeners_model = {};
     _item_template = document.createElement('template');
     _items = new Map();
     _model = null;
     _target = this;
-
-    _model_eventListeners = {
-        add: this._model__on_add.bind(this),
-        clear: this._model__on_clear.bind(this),
-        delete: this._model__on_delete.bind(this),
-        filter: this._model__on_filter.bind(this),
-        order: this._model__on_order.bind(this),
-        update: this._model__on_update.bind(this),
-    };
 
 
     Manager = this.constructor.Manager;
@@ -110,14 +112,14 @@ export class Repeater extends Component {
     }
     set model(model) {
         if (this.model instanceof Model) {
-            this.model.eventListeners__remove(this._model_eventListeners);
+            this.model.eventListeners__remove(this._eventListeners_model);
         }
 
         this._model = model || new Model();
         this._attribute__set('model', this._model);
 
         if (this.model instanceof Model) {
-            this.model.eventListeners__add(this._model_eventListeners);
+            this.model.eventListeners__add(this._eventListeners_model);
         }
     }
 
@@ -154,14 +156,22 @@ export class Repeater extends Component {
         this.textContent = '';
     }
 
-    _init() {
+    _eventListeners__define() {
+        super._eventListeners__define();
+
+        this._eventListeners_model = this._eventListeners__proc(this.constructor._eventListeners_model, true);
+    }
+
+    async _init() {
         this._content_initial__define();
         this.props__sync('model', 'target');
 
         this.delegate = this._content_initial.querySelector('[Repeater__delegate]');
         this._model_data__define();
 
-        this.refresh();
+        if (!(this.model instanceof Model)) {
+            await this._items__define();
+        }
     }
 
     _item__create(model_item) {
@@ -175,14 +185,12 @@ export class Repeater extends Component {
             item = this.delegate.cloneNode(true);
         }
 
-        if (this.model instanceof Model) {
-            item.Repeater__manager = new this.Manager({
-                item,
-                model: this.model,
-                model_item,
-            });
-            this._items.set(model_item, item);
-        }
+        item.Repeater__manager = new this.Manager({
+            item,
+            model: this.model,
+            model_item,
+        });
+        this._items.set(model_item, item);
 
         return item;
     }
@@ -209,7 +217,6 @@ export class Repeater extends Component {
 
         for (let model_item of model_items) {
             index = Math.min(index, model_item._index);
-
             let item = this._item__create(model_item);
             items.push(item);
         }
@@ -217,7 +224,6 @@ export class Repeater extends Component {
         let item = this.target.children[index];
         item ? item.before(...items) : this.target.append(...items);
         await this._items__await(items);
-
         this._items__init(items);
         this._items_indexes__apply();
         this.event__dispatch('add', {items});
@@ -228,14 +234,6 @@ export class Repeater extends Component {
         await Promise.all(promises);
     }
 
-    _items__init(items) {
-        if (!(this.model instanceof Model)) return;
-
-        for (let item of items) {
-            item.Repeater__manager.init();
-        }
-    }
-
     _items__clear() {
         this.target.textContent = '';
         this._items.clear();
@@ -244,13 +242,11 @@ export class Repeater extends Component {
     async _items__define() {
         if (!this.delegate) return;
 
-        let items = [];
         this._items__clear();
 
         if (this.model instanceof Model) {
             for (let model_item of this.model._items) {
-                let item = this._item__create(model_item);
-                items.push(item);
+                this._item__create(model_item);
             }
         }
         else {
@@ -259,16 +255,15 @@ export class Repeater extends Component {
                     _index: i,
                     data: i + 1,
                 };
-                let item = this._item__create(model_item);
-                items.push(item);
+                this._item__create(model_item);
             }
         }
 
-        if (!items.length) return;
+        if (!this._items.size) return;
 
+        let items = [...this._items.values()]
         this.target.append(...items);
         await this._items__await(items);
-
         this._items__init(items);
         this.event__dispatch('define', {items});
     }
@@ -299,6 +294,12 @@ export class Repeater extends Component {
         this.event__dispatch('filter');
     }
 
+    _items__init(items) {
+        for (let item of items) {
+            item.Repeater__manager.init();
+        }
+    }
+
     _items__order() {
         if (this.interpolation) {
             this._items__define();
@@ -315,8 +316,6 @@ export class Repeater extends Component {
     }
 
     _items_indexes__apply() {
-        if (!(this.model instanceof Model)) return;
-
         for (let item of this._items.values()) {
             item.Repeater__manager.index__apply();
         }

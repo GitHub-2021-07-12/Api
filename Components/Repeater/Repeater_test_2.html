@@ -129,10 +129,10 @@
                             circle: '',
                         };
 
+                        static _eventListeners = {
+                            click: '_on_click',
+                        };
 
-                        _eventListeners__define() {
-                            this._item.addEventListener('click', this._on_click.bind(this));
-                        }
 
                         _on_click() {
                             this._model.delete(this._model_item._index);
