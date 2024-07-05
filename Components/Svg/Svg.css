@@ -1,0 +1,5 @@
+@layer init {
+    :host {
+        display: block;
+    }
+}

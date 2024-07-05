@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <meta content='user-scalable=no, width=720' name='viewport'>
+        <title>Svg</title>
+
+        <style>
+            :not(:defined) {
+                display: none;
+            }
+
+            x-svg {
+                /* border: 1px solid #000; */
+                display: block;
+            }
+
+            object {
+                /* border: 1px solid #000; */
+            }
+
+            svg {
+                /* border: 1px solid #000; */
+                display: block;
+                fill: none;
+                height: 100px;
+                stroke: #888;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+                stroke-width: 1.4px;
+                width: 100px;
+            }
+        </style>
+
+        <script type='module'>
+            let {Svg} = await import('./Svg.js');
+            await Svg._defined;
+        </script>
+    </head>
+
+    <body>
+        <x-svg url='./Svg.svg#cross'></x-svg>
+        <x-svg url='./Svg_0.svg'></x-svg>
+    </body>
+</html>
