@@ -275,7 +275,7 @@ export class Flickable extends GestureArea {
     }
 
     _init() {
-        this.props__sync('disabled', 'gain', 'shift', 'snag', 'shift_jump');
+        this.props__sync('disabled', 'gain', 'shift', 'shift_jump', 'snag');
         this.refresh();
     }
 

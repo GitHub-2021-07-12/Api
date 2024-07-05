@@ -265,17 +265,6 @@ export class GestureArea extends Component {
         pointer.release();
         this._pointers.delete(pointer.id);
 
-        // if (this._pointers.size) {
-        //     this._pointer_main = [...this._pointers.values()].at(-1);
-
-        //     if (pointer.swipe) {
-        //         this._pointer_main.position_initial.set_vector(this._pointer_main.position).sub(pointer.position_delta);
-        //     }
-        // }
-        // else {
-        //     this._pointer_main = null;
-        // }
-
         if (pointer == this._pointer_main) {
             this._pointer_main = null;
         }
