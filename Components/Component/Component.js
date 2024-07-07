@@ -408,6 +408,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     _eventListeners_elements = {};
     _eventListeners_shadow = {};
     _eventListeners_slots = {};
+    _internals = this.attachInternals();
     _shadow = null;
     _slots = {};
 
@@ -439,6 +440,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
 
             if (attribute_constructor == Boolean) {
                 attribute_value = !!attribute_value;
+                attribute_value ? this._internals.states.add(attribute_name) : this._internals.states.delete(attribute_name);
             }
             else if (attribute_constructor == Number) {
                 attribute_value = +attribute_value;
@@ -556,7 +558,7 @@ export class Component extends Class.mix(HTMLElement, EventManager) {
     }
 
     attribute__set(attribute_name, attribute_value = null) {
-        this.constructor.attribute__set(this, attribute_name, attribute_value);
+        return this.constructor.attribute__set(this, attribute_name, attribute_value);
     }
 
     connectedCallback() {

@@ -21,6 +21,9 @@
         <script type='module'>
             let {Component_new} = await import('./Component_new.js');
             await Component_new._defined;
+
+            window.components_new = document.querySelectorAll('x-component_new');
+            await Promise.all([...components_new].map((item) => item._built));
         </script>
     </head>
 

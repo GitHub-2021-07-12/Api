@@ -179,7 +179,6 @@ export class TrackBar extends Component {
     _puck__on_drag() {
         let puck_position = this.vertical ? this._elements.puck._position.y : this._elements.puck._position.x;
         this.value = this.value_min + puck_position / this._elements.puck.step;
-
         this.event__dispatch('change');
     }
 

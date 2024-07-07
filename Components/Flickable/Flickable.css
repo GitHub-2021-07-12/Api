@@ -84,10 +84,6 @@
         &::part(handle) {
             pointer-events: initial !important;
         }
-
-        &[disabled] {
-            background: gray;
-        }
     }
 
     .scrollBar_x {

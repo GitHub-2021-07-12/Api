@@ -49,25 +49,20 @@
                     padding: 20px;
                 }
 
-                /* &::part(display):focus { */
-                /*     background: #0002; */
-                /* } */
+                &:active {
+                    background: #f002;
+                }
 
-                /* &::part(puck) { */
-                /*     background: #00f4; */
-                /* } */
+                &::part(puck) {
+                    background: #00f4;
+                }
 
-                /* &::part(scrollBar) { */
-                /*     --TrackBar__width: 20px; */
-                /* } */
-
-                /* &:active { */
-                /*     background: #f002; */
-                /* } */
-
-                /* &[_swipe] { */
-                /*     background: #0f02; */
-                /* } */
+                &::part(scrollBar) {
+                    --TrackBar__width: 20px;
+                }
+                &::part(scrollBar):state(disabled) {
+                    background: gray;
+                }
             }
 
 
