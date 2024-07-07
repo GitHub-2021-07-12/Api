@@ -19,15 +19,15 @@
 
 
     slot[name='display'] {
+        &::-webkit-scrollbar {
+            display: none !important;
+        }
+
         &::slotted(*) {
             max-height: var(--Flickable__display__height_max);
             overflow: auto !important;
             scrollbar-width: none !important;
             touch-action: none !important;
-        }
-
-        &::-webkit-scrollbar {
-            display: none !important;
         }
 
         :host([disabled]) &::slotted(*) {

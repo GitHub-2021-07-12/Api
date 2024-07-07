@@ -1,4 +1,4 @@
-<svg xmlns='http://www.w3.org/2000/svg'>
+<svg xmlns='http://www.w3.org/2000/svg' viewBox_='0 0 1 1'>
     <svg id='cross' class='stroke' viewBox='0 0 24 24'>
         <path d='M19 5L5 19M5.00001 5L19 19'/>
     </svg>

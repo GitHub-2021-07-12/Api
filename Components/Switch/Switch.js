@@ -7,6 +7,7 @@ export class Switch extends Component {
 
         _animation: false,
 
+
         animation_implicit: false,
         disabled: false,
         on: false,

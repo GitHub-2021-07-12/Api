@@ -8,8 +8,15 @@
         <title>Edit</title>
 
         <style>
-            :not(:defined) {
-                display: none;
+            * {
+                &:not(:defined) {
+                    display: none;
+                }
+
+
+                &[_building] {
+                    display: none;
+                }
             }
 
 
@@ -18,6 +25,9 @@
                 font: 50px 'Arial';
                 width: 600px;
 
+                &:not([_building]) {
+                    animation: fadeIn 1s;
+                }
                 &::part(button) {
                     height: 48px;
                     /* stroke: blue; */
@@ -41,8 +51,10 @@
             }
 
 
-            [_building] {
-                display: none;
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
             }
         </style>
 

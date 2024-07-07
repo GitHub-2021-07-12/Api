@@ -5,25 +5,17 @@
 
     <div class='button_clear button' part='button button_clear'>
         <slot name='button_clear'>
-            <svg class='icon'>
-                <use href='{{resource: button_clear}}'/>
-            </svg>
+            <x-svg class='icon' url='{{resource: button_clear}}'></x-svg>
         </slot>
     </div>
 
     <div class='button_mask button' part='button button_mask'>
         <slot name='button_mask__off'>
-            <svg class='icon'>
-                <use href='{{resource: button_mask__off}}'/>
-            </svg>
+            <x-svg class='icon' url='{{resource: button_mask__off}}'></x-svg>
         </slot>
 
         <slot name='button_mask__on'>
-            <svg class='icon'>
-                <use href='{{resource: button_mask__on}}'/>
-            </svg>
-
-            <!-- <x-svg url='{{resource: button_mask__on}}'></x-svg> -->
+            <x-svg class='icon' url='{{resource: button_mask__on}}'></x-svg>
         </slot>
     </div>
 </div>

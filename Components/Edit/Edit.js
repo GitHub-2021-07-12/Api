@@ -2,6 +2,7 @@
 
 
 import {Component} from '../Component/Component.js';
+import {Svg} from '../Svg/Svg.js';
 
 
 export class Edit extends Component {
@@ -11,6 +12,7 @@ export class Edit extends Component {
         _focused: false,
         _invalid: false,
         _notEmpty: false,
+
 
         button_clear: false,
         button_mask: false,

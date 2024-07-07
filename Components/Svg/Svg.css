@@ -1,5 +1,39 @@
 @layer init {
     :host {
         display: block;
+        height: 32px;
+        width: 32px;
+    }
+
+
+    /* slot::slotted(*) { */
+    /*     display: block !important; */
+    /*     height: 100% !important; */
+    /*     width: 100% !important; */
+    /* } */
+
+
+    .content {
+        display: contents;
+
+        * {
+            display: block;
+            height: 100%;
+            width: 100%;
+        }
+    }
+
+    .resource {
+        display: none;
+        height: 0;
+        width: 0;
+
+        :host([_loading]) & {
+            display: block;
+        }
+    }
+
+    .root {
+        display: contents;
     }
 }

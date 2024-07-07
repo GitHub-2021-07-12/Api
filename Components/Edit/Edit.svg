@@ -20,7 +20,20 @@
 
 
     <svg id='cross' class='stroke' viewBox='0 0 24 24'>
-        <path d='M19 5L5 19M5.00001 5L19 19'/>
+        <path d='M19 5L5 19M5 5L19 19'/>
+
+        <!-- <path d='M19 5L5 19M5 5L19 19'> -->
+        <!--     <animate -->
+        <!--         attributeName="d" -->
+        <!--         values=" -->
+        <!--             M19 5L5 19M5 5L19 19; -->
+        <!--             M19 5L5 19M5 5L19 30; -->
+        <!--             M19 5L5 19M5 5L19 19; -->
+        <!--         " -->
+        <!--         dur="1s" -->
+        <!--         repeatCount="indefinite" -->
+        <!--     /> -->
+        <!-- </path> -->
     </svg>
 
     <svg id='eye_closed' class='stroke' viewBox='0 0 24 24'>

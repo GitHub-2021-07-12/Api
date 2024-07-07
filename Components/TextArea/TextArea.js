@@ -15,6 +15,7 @@ export class TextArea extends Component {
 
         _focused: false,
 
+
         disabled: false,
         dragAndDrop: false,
         placeholder: '',

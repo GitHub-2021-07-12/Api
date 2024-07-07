@@ -8,29 +8,25 @@
         <title>Svg</title>
 
         <style>
-            :not(:defined) {
-                display: none;
+            * {
+                &[_building] {
+                    display: none;
+                }
+                &:not(:defined) {
+                    display: none;
+                }
             }
 
             x-svg {
-                /* border: 1px solid #000; */
-                display: block;
-            }
-
-            object {
-                /* border: 1px solid #000; */
-            }
-
-            svg {
-                /* border: 1px solid #000; */
-                display: block;
+                border: 1px solid #000;
                 fill: none;
                 height: 100px;
                 stroke: #888;
-                stroke-linecap: round;
-                stroke-linejoin: round;
-                stroke-width: 1.4px;
                 width: 100px;
+
+                &:hover {
+                    stroke: red;
+                }
             }
         </style>
 

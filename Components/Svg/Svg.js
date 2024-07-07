@@ -3,14 +3,29 @@ import {Component} from '../Component/Component.js';
 
 export class Svg extends Component {
     static _attributes = {
+        ...super._attributes,
+
+        _loading: false,
+
+
         url: '',
     };
-    // static _elements = {};
-    // static _eventListeners = {};
 
-    // static css_url = true;
-    // static html_url = true;
-    // static url = import.meta.url;
+    static _elements = {
+        content: '',
+        resource: '',
+    };
+
+    static _eventListeners_elements = {
+        resource: {
+            load: '_resource__on_load',
+        },
+    };
+
+
+    static css_url = true;
+    static html_url = true;
+    static url = import.meta.url;
 
 
     static {
@@ -19,6 +34,15 @@ export class Svg extends Component {
 
 
     _resource = null;
+    _resource_root = null;
+
+
+    get _loading() {
+        return this._attributes._loading;
+    }
+    set _loading(loading) {
+        this._attribute__set('_loading', loading);
+    }
 
 
     get url() {
@@ -27,42 +51,36 @@ export class Svg extends Component {
     set url(url) {
         if (!url) return;
 
-        this._attribute__set('url', url);
-        this._resource__load();
+        this._loading = true;
+        this._elements.resource.data = url;
+        this._attribute__set('url', this._elements.resource.data);
     }
 
 
     _init() {
-        this._resource__create();
         this.props__sync('url');
     }
 
-    _resource__create() {
-        this._resource = document.createElement('object');
-        this._resource.style.display = 'block';
-        this._resource.style.height = '0';
-        this._resource.style.width = '0';
-        this._resource.addEventListener('load', this._resource__on_load.bind(this));
-    }
-
-    _resource__load() {
-        this._resource.data = this.url;
-        this.append(this._resource);
-    }
-
     _resource__on_load() {
+        this._loading = false;
         this._resource_content__extract();
+        this.event__dispatch('load');
     }
 
     _resource_content__extract() {
-        let svg = this._resource.contentDocument.documentElement;
-        let svg_id = this.url.match(/#\S+$/)?.[0];
+        this._resource_root = this._elements.resource.contentDocument.rootElement;
+        this._elements.resource.data = '';
 
-        if (svg_id) {
-            svg = svg.querySelector(svg_id);
+        if (!this._resource_root) return;
+
+        let element = this._resource_root;
+        let element_id = this.url.match(/#\S+$/)?.[0];
+
+        if (element_id) {
+            element = this._resource_root.querySelector(element_id);
         }
 
-        this.textContent = '';
-        this.append(svg);
+        this._elements.content.textContent = '';
+        this._elements.content.append(element);
     }
 }

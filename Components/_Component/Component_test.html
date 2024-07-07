@@ -8,8 +8,13 @@
         <title>Component_new</title>
 
         <style>
-            :not(:defined) {
-                display: none;
+            * {
+                &[_building] {
+                    display: none;
+                }
+                &:not(:defined) {
+                    display: none;
+                }
             }
         </style>
 

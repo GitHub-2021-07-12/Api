@@ -23,6 +23,7 @@ export class Flickable extends GestureArea {
         _scrollEdge_y_begin: false,
         _scrollEdge_y_end: false,
 
+
         acceleration: {
             default: 0,
             range: [0, Infinity],
