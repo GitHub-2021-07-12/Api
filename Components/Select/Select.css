@@ -9,6 +9,15 @@
     .edit {
         display: block;
         width: unset;
+
+        /* &::part(input) { */
+        /*     user-select: none; */
+        /* } */
+
+        :host(:not([editable])) & {
+            /* display: none; */
+            /* visibility: hidden; */
+        }
     }
 
     .flickable {
@@ -23,38 +32,32 @@
         /* --Flickable__display__height_max: 100px; */
 
         &::part(display) {
-            max-height: 100px;
+            /* max-height: 100px; */
             padding: 8px;
         }
     }
 
     .popup {
-        /* box-sizing: border-box; */
-        /* inset: 0; */
-        /* left: 0px; */
-        /* height: auto; */
-        /* max-height: 100px; */
-        /* position: absolute; */
-        /* right: 0px; */
-        /* top: 100%; */
-        /* width: 100%; */
         background: #faa;
         border: 1px solid #888;
         border-radius: 2px;
-        display: block;
         margin: 0;
         padding: 0;
+        /* position: absolute; */
         width: auto !important;
         z-index: 1;
 
-        :host([open]) & {
+        /* bottom: 100%; */
+        /* top: 100%; */
+
+        /* :host([open]) & { */
             display: block;
-        }
+        /* } */
     }
 
-    /* .repeater { */
-    /*     display: none; */
-    /* } */
+    .repeater {
+        display: contents;
+    }
 
     .root {
         display: contents;

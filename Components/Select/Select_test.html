@@ -8,12 +8,10 @@
 
         <style>
             * {
-                &:not(:defined) {
+                &[_building] {
                     display: none;
                 }
-
-
-                &[_building] {
+                &:not(:defined) {
                     display: none;
                 }
             }
@@ -21,11 +19,10 @@
 
             x-select {
                 user-select: none;
-            }
 
-
-            .delegate {
-                color: red;
+                &::part(item) {
+                    color: red;
+                }
             }
         </style>
 
@@ -42,7 +39,7 @@
 
     <body>
         <x-select>
-            <div class='delegate' Select__delegate>Delegate</div>
+            <!-- <div class='delegate' Select__delegate>Delegate</div> -->
 
             <template Select__model>
                 <script>

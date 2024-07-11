@@ -115,6 +115,10 @@ export class Repeater extends Component {
             this.model.eventListeners__remove(this._eventListeners_model);
         }
 
+        if (model instanceof HTMLTemplateElement) {
+
+        }
+
         this._model = model || new Model();
         this._attribute__set('model', this._model);
 
